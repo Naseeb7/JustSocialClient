@@ -39,7 +39,7 @@ const Navbar = () => {
   const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
 
-//   const fullName = `${user.firstName} ${user.lastName}`;
+  //   const fullName = `${user.firstName} ${user.lastName}`;
 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -64,6 +64,7 @@ const Navbar = () => {
             borderRadius="9px"
             gap="3rem"
             padding=".1rem 1.5rem"
+            ml=".5rem"
           >
             <InputBase placeholder="Search..." />
             <IconButton>
@@ -83,15 +84,22 @@ const Navbar = () => {
               <LightMode sx={{ color: dark, fontSize: "25px" }} />
             )}
           </IconButton>
-          <Message sx={{ color: dark, 
-            fontSize: "25px",
-            }} />
-          <Notifications sx={{ color: dark, fontSize: "25px" }} />
-          <Help sx={{ color: dark, fontSize: "25px" }} />
+          <Message sx={{ color: dark, fontSize: "25px", "&:hover":{
+            cursor : "pointer",
+            color: theme.palette.neutral.mediumMain,
+          } }} />
+          <Notifications sx={{ color: dark, fontSize: "25px", "&:hover":{
+            cursor : "pointer",
+            color: theme.palette.neutral.mediumMain,
+          } }} />
+          <Help sx={{ color: dark, fontSize: "25px", "&:hover":{
+            cursor : "pointer",
+            color: theme.palette.neutral.mediumMain,
+          } }} />
           {/* <FormControl variant="standard" value={fullName}> */}
           <FormControl variant="standard">
             <Select
-            //   value={fullName}
+              //   value={fullName}
               sx={{
                 backgroundColor: neutralLight,
                 width: "150px",
@@ -116,28 +124,30 @@ const Navbar = () => {
             </Select>
           </FormControl>
         </FlexBetween>
-      ) : (<Box>
-         <IconButton 
-        onClick={() => dispatch(setMode())}
-        sx={{ fontSize: "25px" }}>
-          {theme.palette.mode === "dark" ? (
-            <DarkMode sx={{ fontSize: "25px" }} />
-          ) : (
-            <LightMode sx={{ color: dark, fontSize: "25px" }} />
-          )}
-        </IconButton>
-        
-        <IconButton
-          onClick={() => setisMobileMenuToggled(!isMobileMenuToggled)}
-          sx={{
-            "&:focus":{
-              color:theme.palette.neutral.medium,
-            }
-          }}
-        >
-          <Menu />
-        </IconButton>
-      </Box>
+      ) : (
+        <Box>
+          <IconButton
+            onClick={() => dispatch(setMode())}
+            sx={{ fontSize: "25px" }}
+          >
+            {theme.palette.mode === "dark" ? (
+              <DarkMode sx={{ fontSize: "25px" }} />
+            ) : (
+              <LightMode sx={{ color: dark, fontSize: "25px" }} />
+            )}
+          </IconButton>
+
+          <IconButton
+            onClick={() => setisMobileMenuToggled(!isMobileMenuToggled)}
+            sx={{
+              "&:focus": {
+                color: theme.palette.neutral.medium,
+              },
+            }}
+          >
+            <Menu />
+          </IconButton>
+        </Box>
       )}
 
       {/* Mobile Nav */}
@@ -162,16 +172,24 @@ const Navbar = () => {
           </Box>
 
           {/* Menu Items */}
-          <FlexBetween display="flex" flexDirection="column" justifyContent="center" alignItems="center" gap="3rem">
-            {/* <IconButton 
-            onClick={() => dispatch(setMode())}
-            sx={{ fontSize: "25px" }}>
-              {theme.palette.mode === "dark" ? (
-                <DarkMode sx={{ fontSize: "25px" }} />
-              ) : (
-                <LightMode sx={{ color: dark, fontSize: "25px" }} />
-              )}
-            </IconButton> */}
+          <FlexBetween
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+            gap="3rem"
+          >
+            <FlexBetween
+              backgroundColor={neutralLight}
+              borderRadius="9px"
+              gap="2rem"
+              padding=".1rem .8rem"
+            >
+              <InputBase placeholder="Search..." />
+              <IconButton>
+                <Search />
+              </IconButton>
+            </FlexBetween>
             <Message sx={{ color: dark, fontSize: "25px" }} />
             <Notifications sx={{ color: dark, fontSize: "25px" }} />
             <Help sx={{ color: dark, fontSize: "25px" }} />
