@@ -35,7 +35,7 @@ const LoginPage=()=>{
         backgroundColor={theme.palette.background.alt}
         >
             <Typography fontWeight="500" variant="h5" sx={{mb : "1.5rem"}}>
-                Welcome to JustSocial, a social media for people just social !
+                Welcome to JustSocial, just social!
             </Typography>
         </Box>
     </Box>
