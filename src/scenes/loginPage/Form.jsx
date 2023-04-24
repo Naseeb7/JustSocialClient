@@ -60,7 +60,50 @@ const Form = () => {
   const isRegister = pageType === "register";
 
   const register=async (values,onSubmitProps)=>{
-    
+    // this allows to send form info with image
+    const formData=new FormData();
+    for(let value in values){
+        formData.append(value, values[value])
+    }
+    formData.append("picturePath",values.picture.name)
+
+    const saveduserResponse=await fetch(
+        "http://localhost:3001/auth/register",
+        {
+            method: "POST",
+            body : formData,
+        }
+    );
+    const savedUser= saveduserResponse.json();
+    onSubmitProps.resetForm()
+
+    if(savedUser){
+        setPageType("login")
+    }
+  };
+
+  const login=async (values,onSubmitProps)=>{
+    const loggedInUserResponse=await fetch(
+        "http://localhost:3001/auth/login",
+        {
+            method: "POST",
+            headers : {"Content-Type" : "application/json"},
+            body : JSON.stringify(values),
+        }
+    );
+    const loggedIn=await loggedInUserResponse.json();
+    onSubmitProps.resetForm()
+
+    if(loggedIn){
+        dispatch(
+            setLogin({
+                user: loggedIn.user,
+                token: loggedIn.token,
+            })
+        );
+        navigate("/home")
+    }
+
   }
 
   const handleFormSubmit = async (values, onSubmitProps) => {
@@ -89,7 +132,7 @@ const Form = () => {
             gap="30px"
             gridTemplateColumns="repeat(4, minmax(0,1fr))"
             sx={{
-              "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+              "& > div": { gridColumn: isNonMobile ? "span 4" : undefined   },
             }}
           >
             {isRegister && (
@@ -100,11 +143,9 @@ const Form = () => {
                   onChange={handleChange}
                   value={values.firstName}
                   name="firstName"
-                  error={
-                    Boolean(touched.firstName) && Boolean(errors.firstName)
-                  }
+                  error={Boolean(touched.firstName) && Boolean(errors.firstName)}
                   helperText={touched.firstName && errors.firstName}
-                  sx={{ gridColumn: "span 2" }}
+                  sx={{ gridColumn: "span 2"}}
                 />
                 <TextField
                   label="Last Name"

@@ -37,6 +37,7 @@ const LoginPage=()=>{
             <Typography fontWeight="500" variant="h5" sx={{mb : "1.5rem"}}>
                 Welcome to JustSocial, you know just social !
             </Typography>
+        <Form/>
         </Box>
     </Box>
 }
