@@ -29,7 +29,7 @@ export const authSlice= createSlice({
                 console.log("No friends");
             }
         },
-        setPosts : (state,action)=>{
+        setFeeds : (state,action)=>{
             state.posts=action.payload.posts;
         },
         setPost: (state,action)=>{

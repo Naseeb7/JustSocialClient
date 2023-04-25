@@ -84,18 +84,17 @@ const Navbar = () => {
               <LightMode sx={{ color: dark, fontSize: "25px" }} />
             )}
           </IconButton>
-          <Message sx={{ color: dark, fontSize: "25px", "&:hover":{
-            cursor : "pointer",
-            color: theme.palette.neutral.mediumMain,
-          } }} />
-          <Notifications sx={{ color: dark, fontSize: "25px", "&:hover":{
-            cursor : "pointer",
-            color: theme.palette.neutral.mediumMain,
-          } }} />
-          <Help sx={{ color: dark, fontSize: "25px", "&:hover":{
-            cursor : "pointer",
-            color: theme.palette.neutral.mediumMain,
-          } }} />
+          <IconButton>
+          <Message sx={{ color: dark, fontSize: "25px" }} />
+          </IconButton>
+          <IconButton>
+          <Notifications sx={{ color: dark, fontSize: "25px" }} />
+          </IconButton>
+          <IconButton>
+          <Help sx={{ color: dark, fontSize: "25px" }} />
+          </IconButton>
+          
+          
           <FormControl variant="standard" value={fullName}>
           {/* <FormControl variant="standard"> */}
             <Select
