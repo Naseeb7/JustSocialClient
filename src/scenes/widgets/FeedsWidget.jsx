@@ -11,33 +11,35 @@ const FeedsWidget=({userId, isProfile=false})=>{
     const token=useSelector((state)=> state.token);
 
     const getFeeds=async ()=>{
-        const response= fetch(`${BaseUrl}/posts`,{
+        const response=await fetch(`${BaseUrl}/posts`,{
             method: "GET",
             headers : {Authorization : `Bearer ${token}`},
         })
-        const data=(await response).json();
+        const data=await response.json();
         dispatch(setFeeds({posts : data}));
     }
     const getUserPosts=async ()=>{
-        const response= fetch(`${BaseUrl}/posts/${userId}`,{
+        const response=await fetch(`${BaseUrl}/posts/${userId}/posts`,{
             method: "GET",
             headers : {Authorization : `Bearer ${token}`},
         })
-        const data=(await response).json();
+        const data=await response.json();
         dispatch(setFeeds({posts : data}));
     }
 
     useEffect(()=>{
         if(isProfile){
             getUserPosts();
+            console.log("Effect2")
         } else{
             getFeeds();
+            console.log("Effect")
         }
     },[]) //eslint-disable-line react-hooks/exhaustive-deps
 
     return (
-        <>
-        {posts.slice(0).reverse().map(
+         <>
+        {posts.map(
             ({
                 _id,
                 userId,
@@ -50,11 +52,12 @@ const FeedsWidget=({userId, isProfile=false})=>{
                 likes,
                 comments,
             })=>(
+                // <>{lastName}</>
                 <PostWidget 
                 key={_id}
                 postId={_id}
                 postUserId={userId}
-                name-={`${firstName} ${lastName}`}
+                name={`${firstName} ${lastName}`}
                 description={description}
                 location={location}
                 picturePath={picturePath}

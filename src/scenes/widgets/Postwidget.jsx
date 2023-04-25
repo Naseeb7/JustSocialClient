@@ -14,7 +14,7 @@ import { setPost } from "state";
 
 const BaseUrl=process.env.REACT_APP_BASE_URL
 
-const PostWidget = (
+const PostWidget = ({
   postId,
   postUserId,
   name,
@@ -23,8 +23,8 @@ const PostWidget = (
   picturePath,
   userPicturePath,
   likes,
-  comments
-) => {
+  comments,
+}) => {
     const [isComments,setIsComments]=useState(false)
     const dispatch = useDispatch();
     const token = useSelector((state) => state.token);
@@ -39,7 +39,7 @@ const PostWidget = (
     const patchLike=async ()=>{
         const response=await fetch(`${BaseUrl}/posts/${postId}/like`,
         {
-            method: "GET",
+            method: "PATCH",
             headers : {
                 Authorization : `Bearer ${token}`,
                 "content-Type" : "application/json"
@@ -84,7 +84,7 @@ const PostWidget = (
                     </FlexBetween>
 
                     <FlexBetween gap=".3rem">
-                        <IconButton onClick={setIsComments(!isComments)}>
+                        <IconButton onClick={()=>{setIsComments(!isComments)}}>
                                 <ChatBubbleOutlineOutlined />
                         </IconButton>
                         <Typography>{comments.length}</Typography>
@@ -94,6 +94,19 @@ const PostWidget = (
                     <ShareOutlined />
                 </IconButton>
             </FlexBetween>
+            {isComments && (
+                <Box mt=".5rem">
+                    {comments.map((comment, i)=>(
+                        <Box key={`${name}-${i}`}>
+                            <Divider />
+                            <Typography sx={{color : main, m:".5rem 0", pl:"1rem"}}>
+                                {comment}
+                            </Typography>
+                        </Box>
+                    ))}
+                    <Divider />
+                </Box>
+            )}
         </WidgetWrapper>
     )
 };
