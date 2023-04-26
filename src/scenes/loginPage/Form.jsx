@@ -263,6 +263,7 @@ const Form = () => {
                 setPageType(isLogin ? "register" : "login");
                 resetForm();
               }}
+              width="40%"
               sx={{
                 textDecoration: "underline",
                 color: palette.primary.main,

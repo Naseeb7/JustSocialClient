@@ -29,9 +29,11 @@ const BaseUrl = process.env.REACT_APP_BASE_URL;
 
 const PostUploadWidget = ({ picturePath }) => {
   const dispatch = useDispatch();
+  const [isMobileMenuToggled, setisMobileMenuToggled] = useState(false);
   const [isImage, setIsImage] = useState(false);
   const [image, setImage] = useState(null);
   const [post, setPost] = useState("");
+  const [location, setLocation] = useState("");
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
@@ -43,6 +45,7 @@ const PostUploadWidget = ({ picturePath }) => {
     const formData = new FormData();
     formData.append("userId", _id);
     formData.append("description", post);
+    formData.append("location", location);
     if (image) {
       formData.append("picture", image);
       formData.append("picturePath", image.name);
@@ -56,6 +59,7 @@ const PostUploadWidget = ({ picturePath }) => {
     dispatch(setFeeds({ posts }));
     setImage(null);
     setPost("");
+    setLocation("")
   };
 
   return (
@@ -74,6 +78,20 @@ const PostUploadWidget = ({ picturePath }) => {
           }}
         />
       </FlexBetween>
+        <Box display="flex" gap="1rem" mt="1rem" width="100%" justifyContent="center">
+        <InputBase
+          placeholder="location"
+          onChange={(e) => setLocation(e.target.value)}
+          value={location}
+          sx={{
+            width: "30%",
+            backgroundColor: palette.neutral.light,
+            borderRadius: "2rem",
+            p: ".2rem .5rem",
+            textAlign:"center",
+          }}
+        />
+        </Box>
       {isImage && (
         <Box
           borderRadius="10px"
@@ -154,11 +172,13 @@ const PostUploadWidget = ({ picturePath }) => {
           </>
         ) : (
           <>
-            <FlexBetween gap=".25rem">
+            <FlexBetween gap=".25rem" border="1px solid red" onClick={()=>{setisMobileMenuToggled(!isMobileMenuToggled)}}>
                 <MoreHorizOutlined sx={{color : mediumMain}} />
             </FlexBetween>
           </>
         )}
+
+        
 
         <Button 
             disabled={!post}
@@ -169,6 +189,40 @@ const PostUploadWidget = ({ picturePath }) => {
                 borderRadius : "3rem"
             }}>Post</Button>
       </FlexBetween>
+      {isMobileMenuToggled && (
+          <Box
+          zIndex="10"
+          maxWidth="500px"
+          minWidth="300px"
+          background={palette.background.alt}
+          border="2px solid red"
+        >
+
+          {/* Menu Items */}
+          <FlexBetween
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+            gap="3rem"
+          >
+            <FlexBetween gap=".25rem">
+              <GifBoxOutlined sx={{ color: mediumMain }} />
+              <Typography sx={{ color: mediumMain }}>Clip</Typography>
+            </FlexBetween>
+
+            <FlexBetween gap=".25rem">
+              <AttachFileOutlined sx={{ color: mediumMain }} />
+              <Typography sx={{ color: mediumMain }}>Attachment</Typography>
+            </FlexBetween>
+
+            <FlexBetween gap=".25rem">
+              <MicOutlined sx={{ color: mediumMain }} />
+              <Typography sx={{ color: mediumMain }}>Audio</Typography>
+            </FlexBetween>
+          </FlexBetween>
+        </Box>
+        )}
     </WidgetWrapper>
   );
 };

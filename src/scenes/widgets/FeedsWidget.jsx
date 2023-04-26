@@ -10,12 +10,22 @@ const FeedsWidget=({userId, isProfile=false})=>{
     const posts=useSelector((state)=> state.posts);
     const token=useSelector((state)=> state.token);
 
+    const shuffleArray=(array)=> {
+        for (let i = array.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i-1));
+            let temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
+
     const getFeeds=async ()=>{
         const response=await fetch(`${BaseUrl}/posts`,{
             method: "GET",
             headers : {Authorization : `Bearer ${token}`},
         })
         const data=await response.json();
+        shuffleArray(data)
         dispatch(setFeeds({posts : data}));
     }
     const getUserPosts=async ()=>{
@@ -30,16 +40,14 @@ const FeedsWidget=({userId, isProfile=false})=>{
     useEffect(()=>{
         if(isProfile){
             getUserPosts();
-            console.log("Effect2")
         } else{
             getFeeds();
-            console.log("Effect")
         }
     },[]) //eslint-disable-line react-hooks/exhaustive-deps
 
     return (
          <>
-        {posts.map(
+        {posts.slice(0).reverse().map(
             ({
                 _id,
                 userId,
