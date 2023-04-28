@@ -42,7 +42,6 @@ const FeedsWidget=({userId, isProfile=false})=>{
             getUserPosts();
         } else{
             getFeeds();
-            console.log("effect")
         }
     },[]) //eslint-disable-line react-hooks/exhaustive-deps
 

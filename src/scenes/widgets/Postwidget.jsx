@@ -1,5 +1,6 @@
 import {
   ChatBubbleOutlineOutlined,
+  DeleteOutlineOutlined,
   FavoriteBorderOutlined,
   FavoriteOutlined,
   ShareOutlined,
@@ -11,7 +12,7 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setPost } from "state";
+import { setFeeds, setPost } from "state";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -25,8 +26,8 @@ const PostWidget = ({
   userPicturePath,
   likes,
   comments,
+  isPostPage=false
 }) => {
-  const [isComments, setIsComments] = useState(false);
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
@@ -51,13 +52,18 @@ const PostWidget = ({
     dispatch(setPost({ post: updatedPost }));
   };
 
+  const handlePostDelete=async ()=>{
+    const response = await fetch(`${BaseUrl}/posts/${postId}/deletepost`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await response.json();
+    dispatch(setFeeds({posts : data}))
+  }
+
   return (
     <WidgetWrapper
       m="2rem 0"
-      onClick={() => {
-        navigate(`/post/${postId}`);
-        navigate(0);
-      }}
     >
       <Friend
         friendId={postUserId}
@@ -65,7 +71,7 @@ const PostWidget = ({
         subtitle={location}
         userPicturePath={userPicturePath}
       />
-      <Typography color={main} mt="1rem">
+      <Typography color={main} mt="1rem" onClick={() => {!isPostPage && navigate(`/post/${postId}`)}}>
         {description}
       </Typography>
       {picturePath && (
@@ -75,6 +81,7 @@ const PostWidget = ({
           alt="post"
           style={{ borderRadius: ".75rem", mt: ".75rem" }}
           src={`${BaseUrl}/assets/${picturePath}`}
+          onClick={() => {!isPostPage && navigate(`/post/${postId}`)}}
         />
       )}
       <FlexBetween mt=".25rem">
@@ -89,35 +96,22 @@ const PostWidget = ({
             </IconButton>
             <Typography>{likeCount}</Typography>
           </FlexBetween>
-
-          <FlexBetween gap=".3rem">
-            <IconButton
-              onClick={() => {
-                setIsComments(!isComments);
-              }}
-            >
+          {!isPostPage && <FlexBetween gap=".3rem">
+            <IconButton onClick={() => {!isPostPage && navigate(`/post/${postId}`)}} >
               <ChatBubbleOutlineOutlined />
             </IconButton>
             <Typography>{comments.length}</Typography>
-          </FlexBetween>
+          </FlexBetween>}
         </FlexBetween>
-        <IconButton>
+        <Box>
+        {loggedInUserId===postUserId && <IconButton onClick={handlePostDelete}>
+          <DeleteOutlineOutlined />
+        </IconButton>}
+        <IconButton onClick={()=>{navigator.clipboard.writeText(`${BaseUrl}/posts/${postId}`)}}>
           <ShareOutlined />
         </IconButton>
+        </Box>
       </FlexBetween>
-      {/* {isComments && (
-                <Box mt=".5rem">
-                    {comments.map((comment, i)=>(
-                        <Box key={`${name}-${i}`}>
-                            <Divider />
-                            <Typography sx={{color : main, m:".5rem 0", pl:"1rem"}}>
-                                {comment}
-                            </Typography>
-                        </Box>
-                    ))}
-                    <Divider />
-                </Box>
-            )} */}
     </WidgetWrapper>
   );
 };

@@ -6,6 +6,7 @@ import {
   ImageOutlined,
   MicOutlined,
   MoreHorizOutlined,
+  AddLocationAltOutlined,
 } from "@mui/icons-material";
 import {
   Box,
@@ -33,6 +34,7 @@ const PostUploadWidget = ({ picturePath }) => {
   const [isImage, setIsImage] = useState(false);
   const [image, setImage] = useState(null);
   const [post, setPost] = useState("");
+  const [isLocation, setIsLocation] = useState(false);
   const [location, setLocation] = useState("");
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user);
@@ -78,20 +80,19 @@ const PostUploadWidget = ({ picturePath }) => {
           }}
         />
       </FlexBetween>
-        <Box display="flex" gap="1rem" mt="1rem" width="100%" justifyContent="center">
+        {isLocation && <Box display="flex" gap="1rem" mt="1rem" width="100%" justifyContent="center">
         <InputBase
           placeholder="location"
           onChange={(e) => setLocation(e.target.value)}
           value={location}
           sx={{
-            width: "30%",
+            width: "55%",
             backgroundColor: palette.neutral.light,
             borderRadius: "2rem",
-            p: ".2rem .5rem",
-            textAlign:"center",
+            p: ".2rem 1rem",
           }}
         />
-        </Box>
+        </Box>}
       {isImage && (
         <Box
           borderRadius="10px"
@@ -161,18 +162,18 @@ const PostUploadWidget = ({ picturePath }) => {
             </FlexBetween>
 
             <FlexBetween gap=".25rem">
-              <AttachFileOutlined sx={{ color: mediumMain }} />
-              <Typography sx={{ color: mediumMain }}>Attachment</Typography>
-            </FlexBetween>
-
-            <FlexBetween gap=".25rem">
               <MicOutlined sx={{ color: mediumMain }} />
               <Typography sx={{ color: mediumMain }}>Audio</Typography>
+            </FlexBetween>
+
+            <FlexBetween gap=".25rem" onClick={()=>setIsLocation(!isLocation)}>
+              <AddLocationAltOutlined sx={{ color: mediumMain }} />
+              <Typography sx={{ color: mediumMain,"&:hover": { cursor: "pointer", color: medium }  }}>Location</Typography>
             </FlexBetween>
           </>
         ) : (
           <>
-            <FlexBetween gap=".25rem" border="1px solid red" onClick={()=>{setisMobileMenuToggled(!isMobileMenuToggled)}}>
+            <FlexBetween gap=".25rem" onClick={()=>{setisMobileMenuToggled(!isMobileMenuToggled)}}>
                 <MoreHorizOutlined sx={{color : mediumMain}} />
             </FlexBetween>
           </>
@@ -195,7 +196,7 @@ const PostUploadWidget = ({ picturePath }) => {
           maxWidth="500px"
           minWidth="300px"
           background={palette.background.alt}
-          border="2px solid red"
+          mt="1rem"
         >
 
           {/* Menu Items */}
@@ -219,6 +220,11 @@ const PostUploadWidget = ({ picturePath }) => {
             <FlexBetween gap=".25rem">
               <MicOutlined sx={{ color: mediumMain }} />
               <Typography sx={{ color: mediumMain }}>Audio</Typography>
+            </FlexBetween>
+
+            <FlexBetween gap=".25rem" onClick={()=>setIsLocation(!isLocation)}>
+              <AddLocationAltOutlined sx={{ color: mediumMain }} />
+              <Typography sx={{ color: mediumMain,"&:hover": { cursor: "pointer", color: medium }  }}>Location</Typography>
             </FlexBetween>
           </FlexBetween>
         </Box>

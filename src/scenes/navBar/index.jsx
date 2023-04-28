@@ -39,7 +39,7 @@ const Navbar = () => {
   const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
 
-    const fullName = `${user.firstName} ${user.lastName}`;
+  const fullName = `${user.firstName} ${user.lastName}`;
 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -63,7 +63,8 @@ const Navbar = () => {
             backgroundColor={neutralLight}
             borderRadius="9px"
             gap="3rem"
-            padding=".1rem 1.5rem"
+            padding=".1rem"
+            pl="1.5rem"
             ml=".5rem"
           >
             <InputBase placeholder="Search..." />
@@ -85,20 +86,19 @@ const Navbar = () => {
             )}
           </IconButton>
           <IconButton>
-          <Message sx={{ color: dark, fontSize: "25px" }} />
+            <Message sx={{ color: dark, fontSize: "25px" }} />
           </IconButton>
           <IconButton>
-          <Notifications sx={{ color: dark, fontSize: "25px" }} />
+            <Notifications sx={{ color: dark, fontSize: "25px" }} />
           </IconButton>
           <IconButton>
-          <Help sx={{ color: dark, fontSize: "25px" }} />
+            <Help sx={{ color: dark, fontSize: "25px" }} />
           </IconButton>
-          
-          
+
           <FormControl variant="standard" value={fullName}>
-          {/* <FormControl variant="standard"> */}
+            {/* <FormControl variant="standard"> */}
             <Select
-                value={fullName}
+              value={fullName}
               sx={{
                 backgroundColor: neutralLight,
                 width: "150px",
@@ -114,8 +114,14 @@ const Navbar = () => {
               }}
               input={<InputBase />}
             >
-              <MenuItem value={fullName}>
-              {/* <MenuItem> */}
+              <MenuItem
+                value={fullName}
+                onClick={() => {
+                  navigate(`/profile/${user._id}`);
+                  navigate(0);
+                }}
+              >
+                {/* <MenuItem> */}
                 <Typography>{fullName}</Typography>
                 {/* <Typography>Pradosh Chand</Typography> */}
               </MenuItem>
@@ -193,7 +199,7 @@ const Navbar = () => {
             <Notifications sx={{ color: dark, fontSize: "25px" }} />
             <Help sx={{ color: dark, fontSize: "25px" }} />
             <FormControl variant="standard" value={fullName}>
-            {/* <FormControl variant="standard"> */}
+              {/* <FormControl variant="standard"> */}
               <Select
                 value={fullName}
                 sx={{
@@ -212,7 +218,7 @@ const Navbar = () => {
                 input={<InputBase />}
               >
                 <MenuItem value={fullName}>
-                {/* <MenuItem> */}
+                  {/* <MenuItem> */}
                   <Typography>{fullName}</Typography>
                   {/* <Typography>Pradosh Chand</Typography> */}
                 </MenuItem>
