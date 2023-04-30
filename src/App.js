@@ -9,6 +9,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
 import Postpage from "scenes/Postpage";
+import AccountPage from "scenes/accountPage";
 
 function App() {
   const mode = useSelector((state) => state.mode)
@@ -25,6 +26,7 @@ function App() {
             <Route path="/home" element={isAuth ? <HomePage /> : <Navigate to="/"/>} />
             <Route path="/profile/:userId" element={isAuth ? <ProfilePage /> : <Navigate to="/"/>} />
             <Route path="/post/:postId" element={isAuth ? <Postpage /> : <Navigate to="/"/>} />
+            <Route path="/account/:userId" element={isAuth ? <AccountPage /> : <Navigate to="/"/>} />
           </Routes>
         </ThemeProvider>
       </Router>

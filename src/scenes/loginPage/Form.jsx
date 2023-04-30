@@ -224,6 +224,7 @@ const Form = () => {
 
             <TextField
               label="E-mail"
+              autoFocus
               onBlur={handleBlur}
               onChange={handleChange}
               value={values.email}

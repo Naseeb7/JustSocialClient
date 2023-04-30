@@ -70,7 +70,14 @@ const Postpage = () => {
     }
   };
 
-
+  const handleDeleteComment=async (commentId)=>{
+    const response = await fetch(`${BaseUrl}/posts/${postId}/commentdelete/${commentId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await response.json();
+    setCurrentPost(data)
+  }
 
   const enterPress = (e) => {
     if (e.key === "Enter") {
@@ -129,10 +136,10 @@ const Postpage = () => {
               </Box>
               <Button
                 id="commentBtn"
-                size="small"
-                variant="standard"
                 sx={{
-                  padding: "0 1rem",
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.background.alt,
+                  "&:hover": { color: theme.palette.primary.main },
                 }}
                 onClick={handleComment}
               >
@@ -188,15 +195,8 @@ const Postpage = () => {
                         {new Date(comment.createdAt).toLocaleString()}
                       </Typography>
                     </Box>
-                    {comment.userId===loggedInUser._id  && 
-                    <IconButton onClick={async ()=>{
-                        const response = await fetch(`${BaseUrl}/posts/${postId}/commentdelete/${comment._id}`, {
-                            method: "DELETE",
-                            headers: { Authorization: `Bearer ${token}` },
-                          });
-                          const data = await response.json();
-                          setCurrentPost(data)
-                    }}>
+                    {(comment.userId===loggedInUser._id || currentPost.userId === loggedInUser._id )  && 
+                    <IconButton onClick={ ()=>{ handleDeleteComment(comment._id) }}>
                       <DeleteOutlineOutlined fontSize="small" />
                     </IconButton>}
                   </Box>
