@@ -55,7 +55,8 @@ const PostWidget = ({
   const handlePostDelete=async ()=>{
     const response = await fetch(`${BaseUrl}/posts/${postId}/deletepost`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${token}`, "content-Type": "application/json",  },
+      body: JSON.stringify({ picturePath: picturePath }),
     });
     const data = await response.json();
     dispatch(setFeeds({posts : data}))

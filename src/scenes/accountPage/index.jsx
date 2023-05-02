@@ -21,7 +21,7 @@ const AccountPage = () => {
         gap=".5rem"
         justifyContent="space-around"
       >
-        <Box flexBasis={isNonMobileScreens ? "40%" : undefined} 
+        <Box flexBasis={isNonMobileScreens ? "50%" : undefined} 
             backgroundColor={theme.palette.background.alt}
             borderRadius="1rem"
             p="2rem"

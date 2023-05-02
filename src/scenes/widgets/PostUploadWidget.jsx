@@ -63,6 +63,7 @@ const PostUploadWidget = ({ picturePath }) => {
     setImage(null);
     setPost("");
     setLocation("")
+    setIsImage(false)
   };
 
   return (
