@@ -8,7 +8,7 @@ import UserImage from "./UserImage";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const Friend = ({ friendId, name, subtitle, userPicturePath,size }) => {
+const Friend = ({ friendId, name, subtitle, userPicturePath, size, isProfile=false }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
@@ -24,7 +24,6 @@ const Friend = ({ friendId, name, subtitle, userPicturePath,size }) => {
   const isFriend = friends.find((friend) => friend._id === friendId);
 
   const patchFriend = async () => {
-    if(_id!==friendId){
       const response = await fetch(`${BaseUrl}/users/${_id}/${friendId}`, {
         method: "PATCH",
         headers: {
@@ -34,10 +33,6 @@ const Friend = ({ friendId, name, subtitle, userPicturePath,size }) => {
       });
       const data = await response.json();
       dispatch(setFriends({ friends: data }));
-    }
-    else{
-      console.log("You cannot be your own friend here")
-    }
   };
 
   return (
@@ -68,7 +63,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath,size }) => {
           </Typography>
         </Box>
       </FlexBetween>
-      {_id!==friendId && (
+      {(_id!==friendId && !isProfile) && (
         <IconButton
         onClick={() => patchFriend()}
         sx={{ backgroundColor: primaryLight, p: ".6rem" }}

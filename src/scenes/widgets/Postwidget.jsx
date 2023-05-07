@@ -26,7 +26,8 @@ const PostWidget = ({
   userPicturePath,
   likes,
   comments,
-  isPostPage=false
+  isPostPage=false,
+  isProfile=false
 }) => {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
@@ -53,13 +54,17 @@ const PostWidget = ({
   };
 
   const handlePostDelete=async ()=>{
-    const response = await fetch(`${BaseUrl}/posts/${postId}/deletepost`, {
+    const response = await fetch(`${BaseUrl}/posts/${loggedInUserId}/${postId}/deletepost`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}`, "content-Type": "application/json",  },
       body: JSON.stringify({ picturePath: picturePath }),
     });
     const data = await response.json();
-    dispatch(setFeeds({posts : data}))
+    if(isProfile){
+      dispatch(setFeeds({posts : data.userposts}))
+    }else{
+      dispatch(setFeeds({posts : data.posts}))
+    }
   }
 
   return (
@@ -71,6 +76,7 @@ const PostWidget = ({
         name={name}
         subtitle={location}
         userPicturePath={userPicturePath}
+        isProfile={isProfile}
       />
       <Typography color={main} mt="1rem" onClick={() => {!isPostPage && navigate(`/post/${postId}`)}}>
         {description}

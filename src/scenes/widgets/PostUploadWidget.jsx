@@ -29,7 +29,7 @@ import { setFeeds } from "state";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const PostUploadWidget = ({ picturePath }) => {
+const PostUploadWidget = ({ picturePath,isProfile=false }) => {
   const dispatch = useDispatch();
   const [isMobileMenuToggled, setisMobileMenuToggled] = useState(false);
   const [isImage, setIsImage] = useState(false);
@@ -58,8 +58,12 @@ const PostUploadWidget = ({ picturePath }) => {
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
     });
-    const posts = await response.json();
-    dispatch(setFeeds({ posts }));
+    const data = await response.json();
+    if(isProfile){
+      dispatch(setFeeds({ posts: data.userposts }));
+    }else{
+      dispatch(setFeeds({ posts: data.posts }));
+    }
     setImage(null);
     setPost("");
     setLocation("")

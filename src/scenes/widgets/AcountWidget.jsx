@@ -132,13 +132,16 @@ const AccountWidget = () => {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
+          "content-Type": "application/json",
         },
+        body: JSON.stringify({password : password}),
       }
     );
     const data=await response.json();
-    console.log(data)
     if(data.success===true){
       navigate("/")
+    }else{
+      setSuccess(false)
     }
   }
 
@@ -207,6 +210,8 @@ const AccountWidget = () => {
                   sx={{
                     "&:hover": {
                       cursor: "pointer",
+                      backgroundColor: theme.palette.background.alt,
+                      color: theme.palette.neutral.main,
                     },
                   }}
                 >
@@ -358,6 +363,9 @@ const AccountWidget = () => {
               }}
               onClick={() => {
                 setIsEdit(!isEdit);
+                setisEditPassword(false)
+                setIsDelete(false)
+                setSuccess(true)
               }}
             >
               Edit Details
@@ -581,6 +589,8 @@ const AccountWidget = () => {
               }}
               onClick={() => {
                 setisEditPassword(!isEditPassword);
+                setIsEdit(false)
+                setIsDelete(false)
               }}
             >
               Change Password
@@ -642,6 +652,36 @@ const AccountWidget = () => {
             <Typography variant="h5" fontWeight="500">Are you sure you want to delete the account?</Typography>
             <Typography fontSize="x-small">**This action cannot be undone!</Typography>
             </Box>
+            <Box display="flex" justifyContent="space-around" width="100%">
+              <FormControl sx={{ width: "80%" }} variant="outlined">
+                <InputLabel htmlFor="passwordVerify">Password</InputLabel>
+                <OutlinedInput
+                  id="passwordVerify"
+                  error={!success && true}
+                  type={showPassword ? "text" : "password"}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleShowPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  label="Password"
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}
+                />
+                <FormHelperText error={!success && true}>
+                  {success
+                    ? "Please enter your password to verify"
+                    : "Wrong password! please enter the correct password"}
+                </FormHelperText>
+              </FormControl>
+            </Box>
             <Box display="flex" width="80%" justifyContent="space-evenly">
               <Button
                 sx={{
@@ -680,6 +720,8 @@ const AccountWidget = () => {
             }}
             onClick={() => {
               setIsDelete(!isDelete);
+              setisEditPassword(false)
+              setIsEdit(false)
             }}
           >
             Delete account

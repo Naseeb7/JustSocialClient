@@ -30,7 +30,7 @@ const HomePage = () => {
             <PostUploadWidget picturePath={picturePath} />
             <FeedsWidget userId={_id} />
         </Box>
-        {isNonMobileScreens && (
+        {(isNonMobileScreens && _id) && (
             <Box flexBasis="26%">
                   <FriendsListWidget userId={_id} />
             </Box>

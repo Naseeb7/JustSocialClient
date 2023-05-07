@@ -16,6 +16,7 @@ const ProfilePage=()=>{
     const {userId}=useParams();
     const theme=useTheme();
     const token=useSelector((state)=>state.token)
+    const id=useSelector((state)=>state.user._id)
     const isNonMobileScreens=useMediaQuery("(min-width:1000px)")
 
     const getUser=async ()=>{
@@ -48,12 +49,18 @@ const ProfilePage=()=>{
       <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
         <UserWidget userId={userId} picturePath={user.picturePath} />
         <Box m="2rem 0" />
-        <FriendListWidget userId={userId} />
+        <FriendListWidget userId={userId} isProfile />
       </Box>
       <Box
         flexBasis={isNonMobileScreens ? "50%" : undefined}
         mt={isNonMobileScreens ? undefined : "2rem"}
+        gap="1rem"
+        display="flex"
+        flexDirection="column"
       >
+        {userId===id && (
+          <PostUploadWidget picturePath={user.picturePath} isProfile />
+        )}
         <Typography color={theme.palette.neutral.main} 
         variant="h2" 
         fontWeight="500"

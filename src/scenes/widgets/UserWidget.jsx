@@ -3,14 +3,17 @@ import {
   EditOutlined,
   LocationOnOutlined,
   WorkOutlineOutlined,
+  PersonRemoveOutlined,
+  PersonAddOutlined,
 } from "@mui/icons-material";
 import { Box, Typography, Divider, useTheme, IconButton } from "@mui/material";
 import UserImage from "components/UserImage";
 import FlexBetween from "components/FlexBetween";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { setFriends } from "state";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -18,11 +21,18 @@ const UserWidget = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
   const { palette } = useTheme();
   const navigate = useNavigate();
+  const friendId=useParams()
   const token = useSelector((state) => state.token);
   const {_id} = useSelector((state) => state.user);
+  const userFriends = useSelector((state) => state.user.friends);
   const dark = palette.neutral.dark;
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
+  const primaryDark = palette.primary.dark;
+  const primaryLight = palette.primary.light;
+  const dispatch=useDispatch()
+
+  const isFriend = userFriends.find((friend) => friend._id === userId);
 
   const getUser = async () => {
     const response = await fetch(`${BaseUrl}/users/${userId}`, {
@@ -40,6 +50,18 @@ const UserWidget = ({ userId, picturePath }) => {
   if (!user) {
     return null;
   }
+
+  const patchFriend = async () => {
+      const response = await fetch(`${BaseUrl}/users/${_id}/${userId}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      dispatch(setFriends({ friends: data }));
+  };
 
   const {
     firstName,
@@ -79,11 +101,22 @@ const UserWidget = ({ userId, picturePath }) => {
             <Typography color={medium}>{friends.length} friends</Typography>
           </Box>
         </FlexBetween>
-        {userId===_id && 
+        {userId===_id ? ( 
         <IconButton onClick={()=>{navigate(`/account/${user._id}`)}}>
         <ManageAccountsOutlined />
         </IconButton>
-        }
+        ):(
+          <IconButton
+        onClick={() => patchFriend()}
+        sx={{ backgroundColor: primaryLight, p: ".6rem" }}
+      >
+        {isFriend ? (
+            <PersonRemoveOutlined sx={{color: primaryDark,}} />
+        ) : (
+            <PersonAddOutlined sx={{color: primaryDark}} />
+        )}
+      </IconButton>
+        )}
       </FlexBetween>
 
       <Divider />

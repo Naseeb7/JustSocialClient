@@ -10,6 +10,7 @@ import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
 import Postpage from "scenes/Postpage";
 import AccountPage from "scenes/accountPage";
+import NotificationPage from "scenes/NotificationsPage";
 
 function App() {
   const mode = useSelector((state) => state.mode)
@@ -24,6 +25,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/home" element={isAuth ? <HomePage /> : <Navigate to="/"/>} />
+            <Route path="/notifications" element={isAuth ? <NotificationPage /> : <Navigate to="/"/>} />
             <Route path="/profile/:userId" element={isAuth ? <ProfilePage /> : <Navigate to="/"/>} />
             <Route path="/post/:postId" element={isAuth ? <Postpage /> : <Navigate to="/"/>} />
             <Route path="/account/:userId" element={isAuth ? <AccountPage /> : <Navigate to="/"/>} />
