@@ -11,6 +11,7 @@ import { themeSettings } from "./theme";
 import Postpage from "scenes/Postpage";
 import AccountPage from "scenes/accountPage";
 import NotificationPage from "scenes/NotificationsPage";
+import Chatroom from "scenes/chatRoom";
 
 function App() {
   const mode = useSelector((state) => state.mode)
@@ -29,6 +30,7 @@ function App() {
             <Route path="/profile/:userId" element={isAuth ? <ProfilePage /> : <Navigate to="/"/>} />
             <Route path="/post/:postId" element={isAuth ? <Postpage /> : <Navigate to="/"/>} />
             <Route path="/account/:userId" element={isAuth ? <AccountPage /> : <Navigate to="/"/>} />
+            <Route path="/:userId/chatroom" element={isAuth ? <Chatroom /> : <Navigate to="/"/>} />
           </Routes>
         </ThemeProvider>
       </Router>

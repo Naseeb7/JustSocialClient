@@ -10,6 +10,7 @@ import {
   useTheme,
   useMediaQuery,
   Divider,
+  Badge,
 } from "@mui/material";
 import {
   Search,
@@ -32,11 +33,13 @@ const BaseUrl = process.env.REACT_APP_BASE_URL;
 const Navbar = () => {
   const [isMobileMenuToggled, setisMobileMenuToggled] = useState(false);
   const [q, setQ] = useState("");
+  const [notificationcounter, setNotificationcounter] = useState(0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const users = useSelector((state) => state.users);
+  const notifications = useSelector((state) => state.notifications);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
   const theme = useTheme();
@@ -47,6 +50,13 @@ const Navbar = () => {
   const alt = theme.palette.background.alt;
 
   const fullName = `${user.firstName} ${user.lastName}`;
+
+  useEffect(() => {
+    const unreadNotifications = notifications.filter(
+      (notification) => notification.read === false
+    ).length;
+    setNotificationcounter(unreadNotifications);
+  }, [notifications]);
 
   const getAllUsers = async () => {
     const response = await fetch(`${BaseUrl}/users/${user._id}/getallusers`, {
@@ -133,7 +143,9 @@ const Navbar = () => {
                             cursor: "pointer",
                           },
                         }}
-                        onClick={()=>{navigate(`/profile/${user._id}`)}}
+                        onClick={() => {
+                          navigate(`/profile/${user._id}`);
+                        }}
                       >
                         <UserImage image={user.picturePath} size="20px" />
                         <Typography>{user.firstName}</Typography>
@@ -142,11 +154,13 @@ const Navbar = () => {
                     );
                   })
                 ) : (
-                  <Box  display="flex"
-                  gap=".5rem"
-                  p=".5rem 1rem"
-                  m=".5rem 1rem"
-                  borderRadius="1rem">
+                  <Box
+                    display="flex"
+                    gap=".5rem"
+                    p=".5rem 1rem"
+                    m=".5rem 1rem"
+                    borderRadius="1rem"
+                  >
                     <Typography>No users with that name</Typography>
                   </Box>
                 )}
@@ -166,11 +180,13 @@ const Navbar = () => {
               <LightMode sx={{ color: dark, fontSize: "25px" }} />
             )}
           </IconButton>
-          <IconButton>
+          <IconButton onClick={() => navigate(`/${user._id}/chatroom`)}>
             <Message sx={{ color: dark, fontSize: "25px" }} />
           </IconButton>
           <IconButton onClick={() => navigate("/notifications")}>
-            <Notifications sx={{ color: dark, fontSize: "25px" }} />
+            <Badge badgeContent={notificationcounter} color="primary">
+              <Notifications sx={{ color: dark, fontSize: "25px" }} />
+            </Badge>
           </IconButton>
           <IconButton>
             <Help sx={{ color: dark, fontSize: "25px" }} />
@@ -276,9 +292,15 @@ const Navbar = () => {
                 onChange={(e) => setQ(e.target.value)}
               />
             </FlexBetween>
-            <Message sx={{ color: dark, fontSize: "25px" }} />
-            <Notifications sx={{ color: dark, fontSize: "25px" }} />
-            <Help sx={{ color: dark, fontSize: "25px" }} />
+            <IconButton onClick={() => navigate(`/${user._id}/chatroom`)}>
+              <Message sx={{ color: dark, fontSize: "25px" }} />
+            </IconButton>
+            <IconButton onClick={() => navigate("/notifications")}>
+              <Notifications sx={{ color: dark, fontSize: "25px" }} />
+            </IconButton>
+            <IconButton>
+              <Help sx={{ color: dark, fontSize: "25px" }} />
+            </IconButton>
             <FormControl variant="standard" value={fullName}>
               {/* <FormControl variant="standard"> */}
               <Select

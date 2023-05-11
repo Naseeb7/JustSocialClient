@@ -84,6 +84,7 @@ const PostUploadWidget = ({ picturePath,isProfile=false }) => {
             borderRadius: "2rem",
             p: "1rem 2rem",
           }}
+          multiline
         />
       </FlexBetween>
         {isLocation && <Box display="flex" gap="1rem" mt="1rem" width="100%" justifyContent="center">

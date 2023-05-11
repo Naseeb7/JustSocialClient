@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { setFriends } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
+import { useEffect, useRef } from "react";
+import { io } from "socket.io-client";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -12,8 +14,10 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, size, isProfile=fal
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
+  const user= useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const friends = useSelector((state) => state.user.friends);
+  const socket = useRef();
 
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
@@ -22,6 +26,12 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, size, isProfile=fal
   const medium = palette.neutral.medium;
 
   const isFriend = friends.find((friend) => friend._id === friendId);
+
+  useEffect(() => {
+    if (user) {
+      socket.current = io(BaseUrl);
+    }
+  }, [user]);
 
   const patchFriend = async () => {
       const response = await fetch(`${BaseUrl}/users/${_id}/${friendId}`, {
@@ -33,6 +43,33 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, size, isProfile=fal
       });
       const data = await response.json();
       dispatch(setFriends({ friends: data }));
+      if(isFriend){
+        socket.current.emit("send-notification", {
+          from: user._id,
+          to: friendId,
+          userId: user._id,
+          toUserId: friendId,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          type:"friend",
+          notification: `${user.firstName} ${user.lastName} removed you from friend.`,
+          userPicturePath: user.picturePath,
+          read : false,
+        });
+      }else{
+        socket.current.emit("send-notification", {
+          from: user._id,
+          to: friendId,
+          userId: user._id,
+          toUserId: friendId,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          type:"friend",
+          notification: `${user.firstName} ${user.lastName} added you as friend.`,
+          userPicturePath: user.picturePath,
+          read : false,
+        });
+      }
   };
 
   return (

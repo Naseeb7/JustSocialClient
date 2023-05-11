@@ -1,0 +1,16 @@
+.EmojiPickerReact {
+    --epr-emoji-size: 1.5rem;
+}
+.epr-body::-webkit-scrollbar{
+    width: .1rem;
+}
+.epr-body::-webkit-scrollbar-thumb{
+    background-color: gray;
+}
+#messageContainer::-webkit-scrollbar{
+    width: .15rem;
+}
+#messageContainer::-webkit-scrollbar-thumb{
+    background-color: gray;
+    border-radius: 1rem;
+}

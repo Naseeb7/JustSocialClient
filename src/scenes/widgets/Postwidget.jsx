@@ -9,10 +9,11 @@ import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
 import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setFeeds, setPost } from "state";
+import { io } from "socket.io-client";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -26,19 +27,27 @@ const PostWidget = ({
   userPicturePath,
   likes,
   comments,
-  isPostPage=false,
-  isProfile=false
+  isPostPage = false,
+  isProfile = false,
 }) => {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
+  const user = useSelector((state) => state.user);
   const loggedInUserId = useSelector((state) => state.user._id);
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
-  const navigate=useNavigate()
+  const navigate = useNavigate();
+  const socket = useRef();
 
   const { palette } = useTheme();
   const main = palette.neutral.main;
   const primary = palette.primary.main;
+
+  useEffect(() => {
+    if (user) {
+      socket.current = io(BaseUrl);
+    }
+  }, [user]);
 
   const patchLike = async () => {
     const response = await fetch(`${BaseUrl}/posts/${postId}/like`, {
@@ -49,28 +58,48 @@ const PostWidget = ({
       },
       body: JSON.stringify({ userId: loggedInUserId }),
     });
+    if(!isLiked){
+      socket.current.emit("send-notification", {
+        from: loggedInUserId,
+        to: postUserId,
+        userId: loggedInUserId,
+        toUserId: postUserId,
+        postId: postId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        type: "post",
+        notification: `${user.firstName} ${user.lastName} liked your post.`,
+        userPicturePath: user.picturePath,
+        postPicturePath: picturePath,
+        read : false,
+      });
+    }
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
 
-  const handlePostDelete=async ()=>{
-    const response = await fetch(`${BaseUrl}/posts/${loggedInUserId}/${postId}/deletepost`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}`, "content-Type": "application/json",  },
-      body: JSON.stringify({ picturePath: picturePath }),
-    });
+  const handlePostDelete = async () => {
+    const response = await fetch(
+      `${BaseUrl}/posts/${loggedInUserId}/${postId}/deletepost`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "content-Type": "application/json",
+        },
+        body: JSON.stringify({ picturePath: picturePath }),
+      }
+    );
     const data = await response.json();
-    if(isProfile){
-      dispatch(setFeeds({posts : data.userposts}))
-    }else{
-      dispatch(setFeeds({posts : data.posts}))
+    if (isProfile) {
+      dispatch(setFeeds({ posts: data.userposts }));
+    } else {
+      dispatch(setFeeds({ posts: data.posts }));
     }
-  }
+  };
 
   return (
-    <WidgetWrapper
-      m="2rem 0"
-    >
+    <WidgetWrapper m="2rem 0">
       <Friend
         friendId={postUserId}
         name={name}
@@ -78,7 +107,13 @@ const PostWidget = ({
         userPicturePath={userPicturePath}
         isProfile={isProfile}
       />
-      <Typography color={main} mt="1rem" onClick={() => {!isPostPage && navigate(`/post/${postId}`)}}>
+      <Typography
+        color={main}
+        mt="1rem"
+        onClick={() => {
+          !isPostPage && navigate(`/post/${postId}`);
+        }}
+      >
         {description}
       </Typography>
       {picturePath && (
@@ -88,7 +123,9 @@ const PostWidget = ({
           alt="post"
           style={{ borderRadius: ".75rem", mt: ".75rem" }}
           src={`${BaseUrl}/assets/${picturePath}`}
-          onClick={() => {!isPostPage && navigate(`/post/${postId}`)}}
+          onClick={() => {
+            !isPostPage && navigate(`/post/${postId}`);
+          }}
         />
       )}
       <FlexBetween mt=".25rem">
@@ -103,20 +140,32 @@ const PostWidget = ({
             </IconButton>
             <Typography>{likeCount}</Typography>
           </FlexBetween>
-          {!isPostPage && <FlexBetween gap=".3rem">
-            <IconButton onClick={() => {!isPostPage && navigate(`/post/${postId}`)}} >
-              <ChatBubbleOutlineOutlined />
-            </IconButton>
-            <Typography>{comments.length}</Typography>
-          </FlexBetween>}
+          {!isPostPage && (
+            <FlexBetween gap=".3rem">
+              <IconButton
+                onClick={() => {
+                  !isPostPage && navigate(`/post/${postId}`);
+                }}
+              >
+                <ChatBubbleOutlineOutlined />
+              </IconButton>
+              <Typography>{comments.length}</Typography>
+            </FlexBetween>
+          )}
         </FlexBetween>
         <Box>
-        {loggedInUserId===postUserId && <IconButton onClick={handlePostDelete}>
-          <DeleteOutlineOutlined />
-        </IconButton>}
-        <IconButton onClick={()=>{navigator.clipboard.writeText(`${BaseUrl}/posts/${postId}`)}}>
-          <ShareOutlined />
-        </IconButton>
+          {loggedInUserId === postUserId && (
+            <IconButton onClick={handlePostDelete}>
+              <DeleteOutlineOutlined />
+            </IconButton>
+          )}
+          <IconButton
+            onClick={() => {
+              navigator.clipboard.writeText(`${BaseUrl}/posts/${postId}`);
+            }}
+          >
+            <ShareOutlined />
+          </IconButton>
         </Box>
       </FlexBetween>
     </WidgetWrapper>

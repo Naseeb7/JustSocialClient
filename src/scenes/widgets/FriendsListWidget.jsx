@@ -44,23 +44,28 @@ const FriendsListWidget = ({ userId, isProfile=false }) => {
       </Typography>
       <Box display="flex" flexDirection="column" gap="1.5rem">
         {userId === id ? (
-          <Box gap="1.5rem" display="flex" flexDirection="column">
-            {friends.length !==0 ? (
-              <Box>
-               { friends.map((friend) => (
-                <Friend
-                  key={`${friend._id}${friend.firstName}`}
-                  friendId={friend._id}
-                  name={`${friend.firstName} ${friend.lastName}`}
-                  subtitle={friend.occupation}
-                  userPicturePath={friend.picturePath}
-                />
-              ))}
-              </Box>
-              ):(
-                <Typography sx={{color : theme.palette.neutral.light }}>No friends to show</Typography>
-              )}
-          </Box>
+          <>
+            {friends && (
+              <Box gap="1.5rem" display="flex" flexDirection="column">
+              {friends.length !==0 ? (
+                <Box gap="1.5rem" display="flex" flexDirection="column">
+                 { friends.map((friend) => (
+                  <Friend
+                    key={`${friend._id}${friend.firstName}`}
+                    friendId={friend._id}
+                    name={`${friend.firstName} ${friend.lastName}`}
+                    subtitle={friend.occupation}
+                    userPicturePath={friend.picturePath}
+                    isProfile={isProfile}
+                  />
+                ))}
+                </Box>
+                ):(
+                  <Typography sx={{color : theme.palette.neutral.light }}>Add friends to show here</Typography>
+                )}
+            </Box>
+            )}
+          </>
         ) : (
           <Box gap="1.5rem" display="flex" flexDirection="column">
             {userFriends.length !==0 ? (
@@ -76,7 +81,7 @@ const FriendsListWidget = ({ userId, isProfile=false }) => {
               ))}
               </Box>
               ):(
-                <Typography sx={{color : theme.palette.neutral.light }}>No friends to show</Typography>
+                <Typography sx={{color : theme.palette.neutral.light }}>Add friends to show here</Typography>
               )}
           </Box>
         )}

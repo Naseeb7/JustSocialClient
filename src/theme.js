@@ -51,6 +51,7 @@ export const themeSettings = (mode) => {
                 dark: colorTokens.primary[200],
                 main: colorTokens.primary[500],
                 light: colorTokens.primary[800],
+                lighter: colorTokens.primary[900],
               },
               neutral: {
                 darker: colorTokens.grey[50],
@@ -58,6 +59,7 @@ export const themeSettings = (mode) => {
                 main: colorTokens.grey[200],
                 mediumMain: colorTokens.grey[300],
                 medium: colorTokens.grey[400],
+                lesslight: colorTokens.grey[600],
                 light: colorTokens.grey[700],
               },
               background: {
@@ -71,6 +73,7 @@ export const themeSettings = (mode) => {
                 dark: colorTokens.primary[700],
                 main: colorTokens.primary[500],
                 light: colorTokens.primary[100],
+                light: colorTokens.primary[50],
               },
               neutral: {
                 darker: colorTokens.grey[900],
@@ -78,6 +81,7 @@ export const themeSettings = (mode) => {
                 main: colorTokens.grey[500],
                 mediumMain: colorTokens.grey[400],
                 medium: colorTokens.grey[300],
+                lesslight: colorTokens.grey[100],
                 light: colorTokens.grey[50],
               },
               background: {

@@ -15,12 +15,13 @@ import {
 import FlexBetween from "components/FlexBetween";
 import Friend from "components/Friend";
 import UserImage from "components/UserImage";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Navbar from "scenes/navBar";
 import PostWidget from "scenes/widgets/PostWidget";
 import { setPost } from "state";
+import { io } from "socket.io-client";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -33,6 +34,7 @@ const Postpage = () => {
   const loggedInUser = useSelector((state) => state.user);
   const theme = useTheme();
   const isNonMobileScreens = useMediaQuery("(min-width : 1000px)");
+  const socket = useRef();
 
   const getPost = async () => {
     const response = await fetch(`${BaseUrl}/posts/${postId}`, {
@@ -42,6 +44,12 @@ const Postpage = () => {
     const data = await response.json();
     setCurrentPost(data);
   };
+
+  useEffect(() => {
+    if (loggedInUser) {
+      socket.current = io(BaseUrl);
+    }
+  }, [loggedInUser]);
 
   useEffect(() => {
     getPost();
@@ -67,6 +75,20 @@ const Postpage = () => {
       setCurrentPost(updatedPost);
       setComment(null);
       document.getElementById("commentText").value = null;
+      socket.current.emit("send-notification", {
+        from: loggedInUser._id,
+        to: currentPost.userId,
+        userId: loggedInUser._id,
+        toUserId : currentPost.userId,
+        postId: postId,
+        firstName: loggedInUser.firstName,
+        lastName: loggedInUser.lastName,
+        type: "post",
+        notification: `${loggedInUser.firstName} ${loggedInUser.lastName} commented on your post.`,
+        userPicturePath: loggedInUser.picturePath,
+        postPicturePath: currentPost.picturePath,
+        read : false,
+      });
     }
   };
 
