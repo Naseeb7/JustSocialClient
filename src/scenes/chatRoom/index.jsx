@@ -2,7 +2,7 @@ import { useTheme } from "@emotion/react";
 import FlexBetween from "components/FlexBetween";
 import Friend from "components/Friend";
 import UserImage from "components/UserImage";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "scenes/navBar";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
@@ -14,6 +14,7 @@ import { EmojiEmotionsOutlined } from "@mui/icons-material";
 import Messages from "components/Messages";
 import "./index.css";
 import { io } from "socket.io-client";
+import { setFriends, setonlineUsers } from "state";
 
 const {
   Box,
@@ -22,17 +23,19 @@ const {
   TextField,
   Button,
   useMediaQuery,
+  Badge,
 } = require("@mui/material");
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const Chatroom = () => {
-  const socket = useRef();
+const Chatroom = ({socket}) => {
+  // const socket = useRef();
   const isNonMobileScreens = useMediaQuery("(min-width : 1000px)");
   const theme = useTheme();
   const user = useSelector((state) => state.user);
   const mode = useSelector((state) => state.mode);
   const token = useSelector((state) => state.token);
+  const onlineUsers = useSelector((state) => state.onlineUsers);
   const navigate = useNavigate();
   const [currentSelected, setCurrentSelected] = useState(null);
   const [sentMessage, setSentMessage] = useState(null);
@@ -40,21 +43,23 @@ const Chatroom = () => {
   const [message, setMessage] = useState("");
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const [typing, setTyping] = useState(false);
+  const dispatch=useDispatch()
 
-  useEffect(() => {
-    if (user) {
-      socket.current = io(BaseUrl, {
-        reconnection: true,
-        reconnectionDelay: 500,
-        reconnectionAttempts: Infinity,
-      });
-      socket.current.emit("add-user", user._id);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     socket.current = io(BaseUrl, {
+  //       reconnection: true,
+  //       reconnectionDelay: 500,
+  //       reconnectionAttempts: Infinity,
+  //     });
+  //     socket.current.emit("add-user", user._id);
+  //   }
+  // }, [user]);
 
   useEffect(() => {
     if (socket.current) {
       socket.current.on("message-receive", (message) => {
+        console.log("message")
         setArrivalMessage({
           fromSelf: false,
           message: message,
@@ -68,7 +73,29 @@ const Chatroom = () => {
         }, 2000);
       });
     }
-  }, []);
+  }, [socket]);
+
+  const getFriends = async () => {
+    const response = await fetch(`${BaseUrl}/users/${user._id}/friends`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await response.json();
+      dispatch(setFriends({ friends: data }));
+    }
+
+  useEffect(()=>{
+    getFriends();
+  },[])
+
+  // useEffect(()=>{
+  //   if(socket.current){
+  //     socket.current.on("online-users",(data)=>{
+  //       dispatch(setonlineUsers({ onlineUsers : data }))
+  //       // console.log(data)
+  //     });
+  //   }
+  // },[user])
 
   const onEmojiClick = (e) => {
     let newmsg = message + e.emoji;
@@ -109,7 +136,6 @@ const Chatroom = () => {
 
   return (
     <Box>
-      <Navbar />
       <Box display="flex" flexDirection="row" height="89vh">
         <Box
           id="contactBox"
@@ -134,7 +160,7 @@ const Chatroom = () => {
             <Box>
               {user.friends.map((friend) => (
                 <Box
-                  key={friend._id}
+                  key={`${friend._id}${friend.firstName}`}
                   p=".25rem"
                   m=".5rem 0"
                   display="flex"
@@ -171,7 +197,9 @@ const Chatroom = () => {
                       },
                     }}
                   >
+                    <Badge color={onlineUsers.includes(friend._id) ? "primary" : "secondary"} variant="dot" >
                     <UserImage image={friend.picturePath} size="45px" />
+                    </Badge>
                   </IconButton>
                   <Box>
                     <Typography

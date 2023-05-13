@@ -110,7 +110,6 @@ const Postpage = () => {
   return (
     currentPost && (
       <Box>
-        <Navbar />
         <Box
           width="100%"
           p="1rem 6%"

@@ -5,14 +5,14 @@ import UserWidget from "scenes/widgets/UserWidget";
 import PostUploadWidget from "scenes/widgets/PostUploadWidget"
 import FeedsWidget from "scenes/widgets/FeedsWidget";
 import FriendsListWidget from "scenes/widgets/FriendsListWidget";
-import { addNotification, setNotifications } from "state";
+import { addNotification, setNotifications, setonlineUsers } from "state";
 import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const HomePage = () => {
-  const socket = useRef();
+const HomePage = ({socket}) => {
+  // const socket = useRef();
   const isNonMobileScreens = useMediaQuery("(min-width : 1000px)");
   const { _id, picturePath } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
@@ -33,37 +33,53 @@ const HomePage = () => {
     getUserNotifications();
   },[])
 
-  useEffect(() => {
-    if (user) {
-      socket.current = io(BaseUrl);
-      socket.current.emit("add-user", user._id);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     socket.current = io(BaseUrl, {
+  //       reconnection: true,
+  //       reconnectionDelay: 500,
+  //       reconnectionAttempts: Infinity,
+  //     });
+  //     socket.current.emit("add-user", user._id);
+  //   }
+  // }, [user]);
 
-  useEffect(() => {
-    if (socket.current) {
-      socket.current.on("get-notification", (data) => {
-       const newNotification= 
-          {
-            userId: data.userId,
-            toUserId : data.toUserId,
-            postId: data.id,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            type: data.type,
-            notification: data.notification,
-            userPicturePath: data.userPicturePath,
-            postPicturePath: data.postPicturePath,
-            read : false,
-          }
-          dispatch(addNotification({notification : newNotification}))
-      });
-    }
-  }, [user]);
+  // useEffect(()=>{
+  //   if(socket.current){
+  //     socket.current.on("online-users",(data)=>{
+  //       dispatch(setonlineUsers({ onlineUsers : data }))
+  //       console.log(data)
+  //     });
+  //   }
+  // },[user])
+
+  // useEffect(()=>{
+  //   socket.current.emit("online-users", user._id);
+  // },[])
+
+  // useEffect(() => {
+  //   if (socket.current) {
+  //     socket.current.on("get-notification", (data) => {
+  //      const newNotification= 
+  //         {
+  //           userId: data.userId,
+  //           toUserId : data.toUserId,
+  //           postId: data.id,
+  //           firstName: data.firstName,
+  //           lastName: data.lastName,
+  //           type: data.type,
+  //           notification: data.notification,
+  //           userPicturePath: data.userPicturePath,
+  //           postPicturePath: data.postPicturePath,
+  //           read : false,
+  //         }
+  //         dispatch(addNotification({notification : newNotification}))
+  //     });
+  //   }
+  // }, [user]);
 
   return (
     <Box>
-      <Navbar />
       <Box
         width="100%"
         p="2rem 6%"
@@ -74,6 +90,11 @@ const HomePage = () => {
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={_id} picturePath={picturePath} />
+          {(!isNonMobileScreens && _id) && (
+            <Box flexBasis="26%">
+                  <FriendsListWidget userId={_id} />
+            </Box>
+        )}
         </Box>
         <Box
           flexBasis={isNonMobileScreens ? "37%" : undefined}

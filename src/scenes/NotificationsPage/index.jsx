@@ -11,6 +11,7 @@ const BaseUrl = process.env.REACT_APP_BASE_URL;
 const NotificationPage = () => {
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
+  const notifications = useSelector((state) => state.notifications);
   const isNonMobileScreens=useMediaQuery("(min-width : 1000px)");
   const dispatch=useDispatch()
 
@@ -29,8 +30,7 @@ const NotificationPage = () => {
 
   return (
     <Box>
-      <Navbar />
-      <Box display="flex" justifyContent="space-around">
+      <Box display="flex" justifyContent="space-around" >
         <Box flexBasis={isNonMobileScreens ? "50%" : "70%"}>
         <NotificationWidget userId={user._id} token={token} />
         </Box>

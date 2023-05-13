@@ -23,14 +23,21 @@ import {
   Close,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { setMode, setLogout, setUsers } from "state";
+import {
+  setMode,
+  setLogout,
+  setUsers,
+  addNotification,
+  setNotifications,
+} from "state";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "components/FlexBetween";
 import UserImage from "components/UserImage";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
+const url = process.env.REACT_APP_HOST_URL;
 
-const Navbar = () => {
+const Navbar = ({ socket }) => {
   const [isMobileMenuToggled, setisMobileMenuToggled] = useState(false);
   const [q, setQ] = useState("");
   const [notificationcounter, setNotificationcounter] = useState(0);
@@ -58,6 +65,19 @@ const Navbar = () => {
     setNotificationcounter(unreadNotifications);
   }, [notifications]);
 
+  const getUserNotifications = async () => {
+    const response = await fetch(`${BaseUrl}/users/${user._id}/notifications`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await response.json();
+    dispatch(setNotifications({ notifications: data }));
+  };
+
+  useEffect(() => {
+    getUserNotifications();
+  }, []);
+
   const getAllUsers = async () => {
     const response = await fetch(`${BaseUrl}/users/${user._id}/getallusers`, {
       method: "GET",
@@ -80,6 +100,30 @@ const Navbar = () => {
     }
     return null;
   });
+
+  useEffect(() => {
+    console.log("useeffect")
+    if (socket.current) {
+      socket.current.on("get-notification", (data) => {
+        console.log("Notification");
+        const newNotification = {
+          userId: data.userId,
+          toUserId: data.toUserId,
+          postId: data.id,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          type: data.type,
+          notification: data.notification,
+          userPicturePath: data.userPicturePath,
+          postPicturePath: data.postPicturePath,
+          read: (window.location.href === `${url}/notifications` ? true : false),
+        };
+        dispatch(addNotification({ notification: newNotification }));
+
+      });
+    }
+    
+  }, [user]);
 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -292,11 +336,20 @@ const Navbar = () => {
                 onChange={(e) => setQ(e.target.value)}
               />
             </FlexBetween>
-            <IconButton onClick={() => navigate(`/${user._id}/chatroom`)}>
+            <IconButton
+              onClick={() => {
+                navigate(`/${user._id}/chatroom`);
+                setisMobileMenuToggled(!isMobileMenuToggled);
+              }}
+            >
               <Message sx={{ color: dark, fontSize: "25px" }} />
             </IconButton>
-            <IconButton onClick={() => navigate("/notifications")}>
-              <Notifications sx={{ color: dark, fontSize: "25px" }} />
+            <IconButton onClick={() => {
+              navigate("/notifications")
+              setisMobileMenuToggled(!isMobileMenuToggled)}}>
+              <Badge badgeContent={notificationcounter} color="primary">
+                <Notifications sx={{ color: dark, fontSize: "25px" }} />
+              </Badge>
             </IconButton>
             <IconButton>
               <Help sx={{ color: dark, fontSize: "25px" }} />

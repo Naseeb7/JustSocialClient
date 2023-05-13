@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const Messages = ({ selectedUser, socket, sentMessage, arrivalMessage }) => {
+const Messages = ({ selectedUser, sentMessage, arrivalMessage }) => {
   const scrollRef = useRef();
   const isNonMobileScreens = useMediaQuery("(min-width : 1000px)");
   const user = useSelector((state) => state.user);

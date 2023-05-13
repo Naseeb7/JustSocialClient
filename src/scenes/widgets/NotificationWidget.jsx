@@ -16,35 +16,7 @@ const NotificationWidget = ({ userId, token }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const dispatch=useDispatch()
-
-  useEffect(() => {
-    if (user) {
-      socket.current = io(BaseUrl);
-      socket.current.emit("add-user", user._id);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (socket.current) {
-      socket.current.on("get-notification", (data) => {
-       const newNotification= 
-          {
-            userId: data.userId,
-            toUserId : data.toUserId,
-            postId: data.id,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            type: data.type,
-            notification: data.notification,
-            userPicturePath: data.userPicturePath,
-            postPicturePath: data.postPicturePath,
-            read : true,
-          }
-          dispatch(addNotification({notification : newNotification}))
-      });
-    }
-  }, [user]);
-
+  
   return (
     <Box
       display="flex"

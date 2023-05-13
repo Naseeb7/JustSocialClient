@@ -37,7 +37,6 @@ const ProfilePage=()=>{
     if(!user) return null;
 
     return <Box>
-    <Navbar />
     <Box
       width="100%"
       p="2rem 6%"
