@@ -4,13 +4,11 @@ import UserImage from "components/UserImage";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
 import { addNotification, setNotifications } from "state";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
 const NotificationWidget = ({ userId, token }) => {
-  const socket = useRef();
   const notifications=useSelector((state)=>state.notifications)
   const user = useSelector((state) => state.user);
   const theme = useTheme();
@@ -27,7 +25,7 @@ const NotificationWidget = ({ userId, token }) => {
       backgroundColor={theme.palette.background.alt}
       borderRadius="1rem"
     >
-      {notifications &&
+      {notifications.length !==0 ? (
         notifications.map((notification) => {
           return (
             <Box
@@ -74,7 +72,11 @@ const NotificationWidget = ({ userId, token }) => {
               )}
             </Box>
           );
-        })}
+        })) : (
+          <Box textAlign="center">
+            <Typography sx={{ color: theme.palette.neutral.medium }}>No notifications yet.</Typography>
+          </Box>
+        )}
     </Box>
   );
 };

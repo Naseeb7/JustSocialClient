@@ -7,7 +7,7 @@ import { setFriends } from "state";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const FriendsListWidget = ({ userId, isProfile=false }) => {
+const FriendsListWidget = ({ userId, isProfile=false,socket }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const token = useSelector((state) => state.token);

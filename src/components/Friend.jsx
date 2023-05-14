@@ -10,14 +10,13 @@ import { io } from "socket.io-client";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const Friend = ({ friendId, name, subtitle, userPicturePath, size, isProfile=false }) => {
+const Friend = ({ friendId, name, subtitle, userPicturePath, size, isProfile=false, socket }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
   const user= useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const friends = useSelector((state) => state.user.friends);
-  const socket = useRef();
 
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
@@ -26,12 +25,6 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, size, isProfile=fal
   const medium = palette.neutral.medium;
 
   const isFriend = friends.find((friend) => friend._id === friendId);
-
-  useEffect(() => {
-    if (user) {
-      socket.current = io(BaseUrl);
-    }
-  }, [user]);
 
   const patchFriend = async () => {
       const response = await fetch(`${BaseUrl}/users/${_id}/${friendId}`, {

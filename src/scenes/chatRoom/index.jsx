@@ -58,22 +58,23 @@ const Chatroom = ({socket}) => {
 
   useEffect(() => {
     if (socket.current) {
+      socket.current.off("message-receive")
       socket.current.on("message-receive", (message) => {
-        console.log("message")
         setArrivalMessage({
           fromSelf: false,
           message: message,
           created: new Date().getTime(),
         });
       });
-      socket.current.on("typing", (data) => {
+      // socket.current.off("typing-data")
+      socket.current.on("typing-data", (data) => {
         setTyping(data);
         setTimeout(() => {
           setTyping(false);
         }, 2000);
       });
     }
-  }, [socket]);
+  }, []);
 
   const getFriends = async () => {
     const response = await fetch(`${BaseUrl}/users/${user._id}/friends`, {
@@ -116,6 +117,7 @@ const Chatroom = ({socket}) => {
       }),
     });
     const data = await response.json();
+    socket.current.off("send-message")
     socket.current.emit("send-message", {
       from: user._id,
       to: currentSelected._id,

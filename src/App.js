@@ -36,7 +36,7 @@ function App() {
           reconnectionAttempts: Infinity,
         });
       }
-      return ()=>{socket.current.off("disconnect",()=>{})}
+      
   }, []);
 
   useEffect(()=>{
@@ -51,8 +51,11 @@ function App() {
         dispatch(setonlineUsers({ onlineUsers : data }))
         // console.log(data)
       });
+      socket.current.on("connect",()=>{
+        console.log("connected to backend")
+      })
     }
-  },[user])
+  },[])
 
   return (
     <div className="App">
@@ -64,8 +67,8 @@ function App() {
             <Route path="/" element={<LoginPage />} />
             <Route path="/home" element={isAuth ? <HomePage socket={socket} /> : <Navigate to="/"/>} />
             <Route path="/notifications" element={isAuth ? <NotificationPage /> : <Navigate to="/"/>} />
-            <Route path="/profile/:userId" element={isAuth ? <ProfilePage /> : <Navigate to="/"/>} />
-            <Route path="/post/:postId" element={isAuth ? <Postpage /> : <Navigate to="/"/>} />
+            <Route path="/profile/:userId" element={isAuth ? <ProfilePage socket={socket} /> : <Navigate to="/"/>} />
+            <Route path="/post/:postId" element={isAuth ? <Postpage socket={socket} /> : <Navigate to="/"/>} />
             <Route path="/account/:userId" element={isAuth ? <AccountPage /> : <Navigate to="/"/>} />
             <Route path="/:userId/chatroom" element={isAuth ? <Chatroom socket={socket} /> : <Navigate to="/"/>} />
           </Routes>

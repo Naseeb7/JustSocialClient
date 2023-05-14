@@ -101,11 +101,11 @@ const HomePage = ({socket}) => {
           mt={isNonMobileScreens ? undefined : "2rem"}
         >
             <PostUploadWidget picturePath={picturePath} />
-            <FeedsWidget userId={_id} />
+            <FeedsWidget userId={_id} socket={socket} />
         </Box>
         {(isNonMobileScreens && _id) && (
             <Box flexBasis="26%">
-                  <FriendsListWidget userId={_id} />
+                  <FriendsListWidget userId={_id} socket={socket} />
             </Box>
         )}
 

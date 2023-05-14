@@ -21,11 +21,10 @@ import { useParams } from "react-router-dom";
 import Navbar from "scenes/navBar";
 import PostWidget from "scenes/widgets/PostWidget";
 import { setPost } from "state";
-import { io } from "socket.io-client";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const Postpage = () => {
+const Postpage = ({socket}) => {
   const [comment, setComment] = useState(null);
   const { postId } = useParams();
   const posts = useSelector((state) => state.posts);
@@ -34,7 +33,6 @@ const Postpage = () => {
   const loggedInUser = useSelector((state) => state.user);
   const theme = useTheme();
   const isNonMobileScreens = useMediaQuery("(min-width : 1000px)");
-  const socket = useRef();
 
   const getPost = async () => {
     const response = await fetch(`${BaseUrl}/posts/${postId}`, {
@@ -44,12 +42,6 @@ const Postpage = () => {
     const data = await response.json();
     setCurrentPost(data);
   };
-
-  useEffect(() => {
-    if (loggedInUser) {
-      socket.current = io(BaseUrl);
-    }
-  }, [loggedInUser]);
 
   useEffect(() => {
     getPost();
@@ -134,6 +126,7 @@ const Postpage = () => {
               likes={currentPost.likes}
               comments={currentPost.comments}
               isPostPage
+              socket={socket}
             />
             <Box
               color={theme.palette.primary.main}

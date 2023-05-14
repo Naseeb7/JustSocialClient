@@ -46,6 +46,7 @@ const Navbar = ({ socket }) => {
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const users = useSelector((state) => state.users);
+  const mode = useSelector((state) => state.mode);
   const notifications = useSelector((state) => state.notifications);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
@@ -102,10 +103,9 @@ const Navbar = ({ socket }) => {
   });
 
   useEffect(() => {
-    console.log("useeffect")
     if (socket.current) {
+      socket.current.off("get-notification");
       socket.current.on("get-notification", (data) => {
-        console.log("Notification");
         const newNotification = {
           userId: data.userId,
           toUserId: data.toUserId,
@@ -116,13 +116,11 @@ const Navbar = ({ socket }) => {
           notification: data.notification,
           userPicturePath: data.userPicturePath,
           postPicturePath: data.postPicturePath,
-          read: (window.location.href === `${url}/notifications` ? true : false),
+          read: window.location.href === `${url}/notifications` ? true : false,
         };
         dispatch(addNotification({ notification: newNotification }));
-
       });
     }
-    
   }, [user]);
 
   return (
@@ -189,6 +187,7 @@ const Navbar = ({ socket }) => {
                         }}
                         onClick={() => {
                           navigate(`/profile/${user._id}`);
+                          navigate(0);
                         }}
                       >
                         <UserImage image={user.picturePath} size="20px" />
@@ -217,17 +216,32 @@ const Navbar = ({ socket }) => {
       {/* Desktop Nav*/}
       {isNonMobileScreens ? (
         <FlexBetween gap="2rem">
-          <IconButton onClick={() => dispatch(setMode())}>
+          <IconButton
+            onClick={() => {
+              dispatch(setMode());
+              setQ("");
+            }}
+          >
             {theme.palette.mode === "dark" ? (
               <DarkMode sx={{ fontSize: "25px" }} />
             ) : (
               <LightMode sx={{ color: dark, fontSize: "25px" }} />
             )}
           </IconButton>
-          <IconButton onClick={() => navigate(`/${user._id}/chatroom`)}>
+          <IconButton
+            onClick={() => {
+              navigate(`/${user._id}/chatroom`);
+              setQ("");
+            }}
+          >
             <Message sx={{ color: dark, fontSize: "25px" }} />
           </IconButton>
-          <IconButton onClick={() => navigate("/notifications")}>
+          <IconButton
+            onClick={() => {
+              navigate("/notifications");
+              setQ("");
+            }}
+          >
             <Badge badgeContent={notificationcounter} color="primary">
               <Notifications sx={{ color: dark, fontSize: "25px" }} />
             </Badge>
@@ -271,29 +285,26 @@ const Navbar = ({ socket }) => {
           </FormControl>
         </FlexBetween>
       ) : (
-        <Box>
-          <IconButton
-            onClick={() => dispatch(setMode())}
-            sx={{ fontSize: "25px" }}
-          >
-            {theme.palette.mode === "dark" ? (
-              <DarkMode sx={{ fontSize: "25px" }} />
-            ) : (
-              <LightMode sx={{ color: dark, fontSize: "25px" }} />
-            )}
-          </IconButton>
-
-          <IconButton
-            onClick={() => setisMobileMenuToggled(!isMobileMenuToggled)}
-            sx={{
-              "&:focus": {
-                color: theme.palette.neutral.medium,
-              },
-            }}
-          >
-            <Menu />
-          </IconButton>
-        </Box>
+        !isMobileMenuToggled && (
+          <Box>
+            <IconButton
+              onClick={() => setisMobileMenuToggled(!isMobileMenuToggled)}
+              sx={{
+                "&:focus": {
+                  color: theme.palette.neutral.medium,
+                },
+              }}
+            >
+              <Badge
+                color="primary"
+                variant="dot"
+                invisible={notificationcounter === 0 ? true : false}
+              >
+                <Menu />
+              </Badge>
+            </IconButton>
+          </Box>
+        )
       )}
 
       {/* Mobile Nav */}
@@ -301,17 +312,28 @@ const Navbar = ({ socket }) => {
         <Box
           position="fixed"
           right="0"
-          bottom="0"
+          top="0"
+          p=".5rem"
           height="100%"
+          gap="2rem"
           zIndex="10"
           maxWidth="500px"
           minWidth="300px"
-          background={background}
+          backgroundColor={
+            mode === "dark"
+              ? "rgba(0, 0, 0, 0.655)"
+              : "rgba(255, 255, 255, 0.675)"
+          }
+          borderRadius="1rem"
+          // border="2px solid red"
         >
           {/* Close Icon */}
-          <Box display="flex" justifyContent="flex-end" p="1rem">
+          <Box display="flex" justifyContent="flex-end" p=".15rem">
             <IconButton
-              onClick={() => setisMobileMenuToggled(!isMobileMenuToggled)}
+              onClick={() => {
+                setisMobileMenuToggled(!isMobileMenuToggled);
+                setQ("");
+              }}
             >
               <Close />
             </IconButton>
@@ -323,30 +345,87 @@ const Navbar = ({ socket }) => {
             flexDirection="column"
             justifyContent="center"
             alignItems="center"
-            gap="3rem"
+            gap="5rem"
           >
-            <FlexBetween
+            <Box
               backgroundColor={neutralLight}
-              borderRadius="9px"
+              borderRadius="1rem"
               gap="2rem"
               padding=".1rem .8rem"
+              position="relative"
             >
               <InputBase
                 placeholder="Search..."
                 onChange={(e) => setQ(e.target.value)}
               />
-            </FlexBetween>
+              {q && (
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  position="absolute"
+                  top="100%"
+                  left="0"
+                  zIndex="20"
+                  backgroundColor={theme.palette.background.default}
+                  borderRadius="1rem"
+                >
+                  {result.length !== 0 ? (
+                    result.map((user) => {
+                      return (
+                        <Box
+                          key={user._id}
+                          display="flex"
+                          gap=".5rem"
+                          p=".5rem 1rem"
+                          m=".5rem 1rem"
+                          borderRadius="1rem"
+                          sx={{
+                            "&:hover": {
+                              backgroundColor: theme.palette.background.alt,
+                              cursor: "pointer",
+                            },
+                          }}
+                          onClick={() => {
+                            navigate(`/profile/${user._id}`);
+                            navigate(0);
+                          }}
+                        >
+                          <UserImage image={user.picturePath} size="20px" />
+                          <Typography>{user.firstName}</Typography>
+                          <Typography>{user.lastName}</Typography>
+                        </Box>
+                      );
+                    })
+                  ) : (
+                    <Box
+                      display="flex"
+                      gap=".5rem"
+                      p=".5rem 1rem"
+                      m=".5rem 1rem"
+                      borderRadius="1rem"
+                    >
+                      <Typography>No users with that name</Typography>
+                    </Box>
+                  )}
+                </Box>
+              )}
+            </Box>
             <IconButton
               onClick={() => {
                 navigate(`/${user._id}/chatroom`);
                 setisMobileMenuToggled(!isMobileMenuToggled);
+                setQ("");
               }}
             >
               <Message sx={{ color: dark, fontSize: "25px" }} />
             </IconButton>
-            <IconButton onClick={() => {
-              navigate("/notifications")
-              setisMobileMenuToggled(!isMobileMenuToggled)}}>
+            <IconButton
+              onClick={() => {
+                navigate("/notifications");
+                setisMobileMenuToggled(!isMobileMenuToggled);
+                setQ("");
+              }}
+            >
               <Badge badgeContent={notificationcounter} color="primary">
                 <Notifications sx={{ color: dark, fontSize: "25px" }} />
               </Badge>
@@ -354,6 +433,18 @@ const Navbar = ({ socket }) => {
             <IconButton>
               <Help sx={{ color: dark, fontSize: "25px" }} />
             </IconButton>
+
+            <IconButton
+              onClick={() => dispatch(setMode())}
+              sx={{ fontSize: "25px" }}
+            >
+              {theme.palette.mode === "dark" ? (
+                <DarkMode sx={{ fontSize: "25px" }} />
+              ) : (
+                <LightMode sx={{ color: dark, fontSize: "25px" }} />
+              )}
+            </IconButton>
+
             <FormControl variant="standard" value={fullName}>
               {/* <FormControl variant="standard"> */}
               <Select
@@ -373,7 +464,13 @@ const Navbar = ({ socket }) => {
                 }}
                 input={<InputBase />}
               >
-                <MenuItem value={fullName}>
+                <MenuItem
+                  value={fullName}
+                  onClick={() => {
+                    navigate(`/profile/${user._id}`);
+                    navigate(0);
+                  }}
+                >
                   {/* <MenuItem> */}
                   <Typography>{fullName}</Typography>
                   {/* <Typography>Pradosh Chand</Typography> */}

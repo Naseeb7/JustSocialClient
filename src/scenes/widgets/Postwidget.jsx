@@ -13,7 +13,6 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setFeeds, setPost } from "state";
-import { io } from "socket.io-client";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -29,6 +28,7 @@ const PostWidget = ({
   comments,
   isPostPage = false,
   isProfile = false,
+  socket
 }) => {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
@@ -37,17 +37,10 @@ const PostWidget = ({
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
   const navigate = useNavigate();
-  const socket = useRef();
 
   const { palette } = useTheme();
   const main = palette.neutral.main;
   const primary = palette.primary.main;
-
-  useEffect(() => {
-    if (user) {
-      socket.current = io(BaseUrl);
-    }
-  }, [user]);
 
   const patchLike = async () => {
     const response = await fetch(`${BaseUrl}/posts/${postId}/like`, {
@@ -106,6 +99,7 @@ const PostWidget = ({
         subtitle={location}
         userPicturePath={userPicturePath}
         isProfile={isProfile}
+        socket={socket}
       />
       <Typography
         color={main}

@@ -11,7 +11,7 @@ import { useTheme } from "@emotion/react";
 
 const BaseUrl=process.env.REACT_APP_BASE_URL
 
-const ProfilePage=()=>{
+const ProfilePage=({socket})=>{
     const [user,setUser]=useState(null)
     const {userId}=useParams();
     const theme=useTheme();
@@ -48,7 +48,7 @@ const ProfilePage=()=>{
       <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
         <UserWidget userId={userId} picturePath={user.picturePath} />
         <Box m="2rem 0" />
-        <FriendListWidget userId={userId} isProfile />
+        <FriendListWidget userId={userId} isProfile socket={socket} />
       </Box>
       <Box
         flexBasis={isNonMobileScreens ? "50%" : undefined}
@@ -65,7 +65,7 @@ const ProfilePage=()=>{
         fontWeight="500"
         textAlign="center"
         >{user.firstName}'s posts</Typography>
-          <FeedsWidget userId={userId} isProfile />
+          <FeedsWidget userId={userId} isProfile socket={socket} />
       </Box>
     </Box>
   </Box>

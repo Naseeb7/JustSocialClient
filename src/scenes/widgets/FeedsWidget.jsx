@@ -5,7 +5,7 @@ import PostWidget from "./PostWidget";
 
 const BaseUrl=process.env.REACT_APP_BASE_URL
 
-const FeedsWidget=({userId, isProfile=false})=>{
+const FeedsWidget=({userId, isProfile=false, socket})=>{
     const dispatch=useDispatch()
     const posts=useSelector((state)=> state.posts);
     const token=useSelector((state)=> state.token);
@@ -73,6 +73,7 @@ const FeedsWidget=({userId, isProfile=false})=>{
                 likes={likes}
                 comments={comments}
                 isProfile={isProfile}
+                socket={socket}
                 />
             )
         )}
