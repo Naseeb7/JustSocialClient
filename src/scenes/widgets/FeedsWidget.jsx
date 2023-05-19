@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setFeeds } from "state";
 import PostWidget from "./PostWidget";
 import Lottie from "lottie-react";
-import animationData from "../../animations/loading.json";
+import animationData from "animations/loading.json";
 import { Box } from "@mui/material";
 
 const BaseUrl=process.env.REACT_APP_BASE_URL

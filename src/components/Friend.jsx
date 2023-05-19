@@ -7,7 +7,7 @@ import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 import { useState } from "react";
 import Lottie from "lottie-react";
-import animationData from "../animations/loading.json";
+import animationData from "animations/loading.json";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 

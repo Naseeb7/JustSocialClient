@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "state";
 import Lottie from "lottie-react";
-import animationData from "../../animations/loading.json";
+import animationData from "animations/loading.json";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 

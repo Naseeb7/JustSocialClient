@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { setFriends } from "state";
 import Lottie from "lottie-react";
-import animationData from "../../animations/loading.json";
+import animationData from "animations/loading.json";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 

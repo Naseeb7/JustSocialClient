@@ -22,7 +22,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFeeds } from "state";
 import Lottie from "lottie-react";
-import animationData from "../../animations/uploading.json";
+import animationData from "animations/uploading.json";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 

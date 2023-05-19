@@ -3,8 +3,8 @@ import { Box, Typography, useMediaQuery } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import Lottie from "lottie-react";
-import animationData2 from "../animations/loading.json";
-import animationData from "../animations/typing.json";
+import animationData2 from "animations/loading.json";
+import animationData from "animations/typing.json";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
