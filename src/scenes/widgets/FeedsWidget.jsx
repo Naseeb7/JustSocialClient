@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFeeds } from "state";
-import PostWidget from "./PostWidget";
+import postWidget from "./PostWidget";
 import Lottie from "lottie-react";
 import animationData from "animations/loading.json";
 import { Box } from "@mui/material";
@@ -75,7 +75,7 @@ const FeedsWidget=({userId, isProfile=false, socket})=>{
                     comments,
                 })=>(
                     // <>{lastName}</>
-                    <PostWidget 
+                    <postWidget 
                     key={_id}
                     postId={_id}
                     postUserId={userId}
