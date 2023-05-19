@@ -4,6 +4,8 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "state";
+import Lottie from "lottie-react";
+import animationData from "../../animations/loading.json";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -14,8 +16,10 @@ const FriendsListWidget = ({ userId, isProfile=false,socket }) => {
   const friends = useSelector((state) => state.user.friends);
   const id = useSelector((state) => state.user._id);
   const [userFriends, setUserFriends] = useState([]);
+  const [loading,setLoading]=useState(false)
 
   const getFriends = async () => {
+    setLoading(true)
     const response = await fetch(`${BaseUrl}/users/${userId}/friends`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
@@ -26,6 +30,7 @@ const FriendsListWidget = ({ userId, isProfile=false,socket }) => {
     } else {
       setUserFriends(data);
     }
+    setLoading(false)
   };
 
   useEffect(() => {
@@ -42,7 +47,24 @@ const FriendsListWidget = ({ userId, isProfile=false,socket }) => {
       >
         Friends List
       </Typography>
-      <Box display="flex" flexDirection="column" gap="1.5rem">
+      {loading ? (
+            <Box
+            display="flex"
+            justifyContent="center"
+            mt=".5rem"
+            >
+            <Lottie
+               animationData={animationData}
+               loop={true}
+               style={{
+                 width: "10%",
+                 height: "100%",
+                 // border: "2px solid green",
+               }}
+             />
+            </Box>
+         ) : (
+          <Box display="flex" flexDirection="column" gap="1.5rem">
         {userId === id ? (
           <>
             {friends && (
@@ -86,6 +108,8 @@ const FriendsListWidget = ({ userId, isProfile=false,socket }) => {
           </Box>
         )}
       </Box>
+         )}
+      
     </WidgetWrapper>
   );
 };

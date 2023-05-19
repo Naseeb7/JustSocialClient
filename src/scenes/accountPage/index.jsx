@@ -1,10 +1,7 @@
 import { useTheme } from "@emotion/react";
 import { Box, useMediaQuery } from "@mui/material";
-import FlexBetween from "components/FlexBetween";
 import { useSelector } from "react-redux";
-import Navbar from "scenes/navBar";
 import AccountWidget from "scenes/widgets/AcountWidget";
-import UserWidget from "scenes/widgets/UserWidget";
 
 const AccountPage = () => {
     const isNonMobileScreens = useMediaQuery("(min-width : 1000px)");

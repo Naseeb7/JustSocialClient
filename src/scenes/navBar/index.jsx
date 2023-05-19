@@ -9,11 +9,9 @@ import {
   FormControl,
   useTheme,
   useMediaQuery,
-  Divider,
   Badge,
 } from "@mui/material";
 import {
-  Search,
   Message,
   DarkMode,
   LightMode,
@@ -53,7 +51,6 @@ const Navbar = ({ socket }) => {
   const theme = useTheme();
   const neutralLight = theme.palette.neutral.light;
   const dark = theme.palette.neutral.dark;
-  const background = theme.palette.background.default;
   const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
 
@@ -64,7 +61,7 @@ const Navbar = ({ socket }) => {
       (notification) => notification.read === false
     ).length;
     setNotificationcounter(unreadNotifications);
-  }, [notifications]);
+  }, [notifications]); //eslint-disable-line react-hooks/exhaustive-deps
 
   const getUserNotifications = async () => {
     const response = await fetch(`${BaseUrl}/users/${user._id}/notifications`, {
@@ -77,7 +74,7 @@ const Navbar = ({ socket }) => {
 
   useEffect(() => {
     getUserNotifications();
-  }, []);
+  }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
   const getAllUsers = async () => {
     const response = await fetch(`${BaseUrl}/users/${user._id}/getallusers`, {
@@ -90,7 +87,7 @@ const Navbar = ({ socket }) => {
 
   useEffect(() => {
     getAllUsers();
-  }, []);
+  }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
   let result = users.filter((user) => {
     if (
@@ -121,7 +118,7 @@ const Navbar = ({ socket }) => {
         dispatch(addNotification({ notification: newNotification }));
       });
     }
-  }, [user]);
+  }, [user]); //eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>

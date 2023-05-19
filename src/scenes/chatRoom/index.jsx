@@ -1,20 +1,15 @@
 import { useTheme } from "@emotion/react";
-import FlexBetween from "components/FlexBetween";
-import Friend from "components/Friend";
 import UserImage from "components/UserImage";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import Navbar from "scenes/navBar";
+import { useNavigate } from "react-router-dom";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
-import FriendsListWidget from "scenes/widgets/FriendsListWidget";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import Picker from "emoji-picker-react";
 import { EmojiEmotionsOutlined } from "@mui/icons-material";
 import Messages from "components/Messages";
 import "./index.css";
-import { io } from "socket.io-client";
-import { setFriends, setonlineUsers } from "state";
+import { setFriends } from "state";
 
 const {
   Box,
@@ -28,8 +23,7 @@ const {
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const Chatroom = ({socket}) => {
-  // const socket = useRef();
+const Chatroom = ({ socket }) => {
   const isNonMobileScreens = useMediaQuery("(min-width : 1000px)");
   const theme = useTheme();
   const user = useSelector((state) => state.user);
@@ -43,22 +37,12 @@ const Chatroom = ({socket}) => {
   const [message, setMessage] = useState("");
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const [typing, setTyping] = useState(false);
-  const dispatch=useDispatch()
-
-  // useEffect(() => {
-  //   if (user) {
-  //     socket.current = io(BaseUrl, {
-  //       reconnection: true,
-  //       reconnectionDelay: 500,
-  //       reconnectionAttempts: Infinity,
-  //     });
-  //     socket.current.emit("add-user", user._id);
-  //   }
-  // }, [user]);
+  const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (socket.current) {
-      socket.current.off("message-receive")
+      socket.current.off("message-receive");
       socket.current.on("message-receive", (message) => {
         setArrivalMessage({
           fromSelf: false,
@@ -66,15 +50,17 @@ const Chatroom = ({socket}) => {
           created: new Date().getTime(),
         });
       });
-      // socket.current.off("typing-data")
+      socket.current.off("typing-data");
       socket.current.on("typing-data", (data) => {
-        setTyping(data);
-        setTimeout(() => {
-          setTyping(false);
-        }, 2000);
+        if (!typing) {
+          setTyping(data);
+          setTimeout(() => {
+            setTyping(false);
+          }, 1500);
+        }
       });
     }
-  }, []);
+  }, [user]); //eslint-disable-line react-hooks/exhaustive-deps
 
   const getFriends = async () => {
     const response = await fetch(`${BaseUrl}/users/${user._id}/friends`, {
@@ -82,21 +68,12 @@ const Chatroom = ({socket}) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await response.json();
-      dispatch(setFriends({ friends: data }));
-    }
+    dispatch(setFriends({ friends: data }));
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     getFriends();
-  },[])
-
-  // useEffect(()=>{
-  //   if(socket.current){
-  //     socket.current.on("online-users",(data)=>{
-  //       dispatch(setonlineUsers({ onlineUsers : data }))
-  //       // console.log(data)
-  //     });
-  //   }
-  // },[user])
+  }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
   const onEmojiClick = (e) => {
     let newmsg = message + e.emoji;
@@ -116,8 +93,9 @@ const Chatroom = ({socket}) => {
         message: message,
       }),
     });
+    // eslint-disable-next-line
     const data = await response.json();
-    socket.current.off("send-message")
+    socket.current.off("send-message");
     socket.current.emit("send-message", {
       from: user._id,
       to: currentSelected._id,
@@ -143,13 +121,20 @@ const Chatroom = ({socket}) => {
           id="contactBox"
           display="flex"
           flexDirection="column"
-          gap=".5rem"
+          gap=".75rem"
           p="1rem"
-          flexBasis={isNonMobileScreens ? "25%" : "40%"}
+          flexBasis={
+            isNonMobileScreens ? "25%" : isMobileMenuToggled ? "10%" : "40%"
+          }
           backgroundColor={theme.palette.background.alt}
           borderRadius=".75rem 0 0 .75rem"
           m=".35rem"
           mr="0.1rem"
+          onClick={() => {
+            if (!isNonMobileScreens) {
+              setIsMobileMenuToggled(!isMobileMenuToggled);
+            }
+          }}
         >
           <Typography
             variant="h4"
@@ -163,7 +148,7 @@ const Chatroom = ({socket}) => {
               {user.friends.map((friend) => (
                 <Box
                   key={`${friend._id}${friend.firstName}`}
-                  p=".25rem"
+                  p=".5rem"
                   m=".5rem 0"
                   display="flex"
                   gap="1rem"
@@ -179,31 +164,38 @@ const Chatroom = ({socket}) => {
                       ? theme.palette.neutral.lesslight
                       : null
                   }
-                  borderRadius=".75rem"
+                  borderRadius="1rem"
                   onClick={() => {
-                    setCurrentSelected(friend);
+                    if (!isMobileMenuToggled) {
+                      setCurrentSelected(friend);
+                      setMessage("");
+                    }
                     setIsemoji(false);
-                    setMessage("");
                   }}
                   //   border="2px solid red"
                 >
-                  <IconButton
-                    onClick={() => {
-                      navigate(`/profile/${friend._id}`);
-                      navigate(0);
-                    }}
+                  <Badge
+                    color={
+                      onlineUsers.includes(friend._id) ? "primary" : "secondary"
+                    }
                     sx={{
-                      "&:hover": {
-                        backgroundColor: theme.palette.primary.light,
-                        cursor: "pointer",
+                      "& .MuiBadge-badge": {
+                        backgroundColor: onlineUsers.includes(friend._id)
+                          ? theme.palette.primary.main
+                          : theme.palette.neutral.medium,
+                        padding: ".32rem",
                       },
                     }}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
+                    overlap="circular"
+                    variant="dot"
                   >
-                    <Badge color={onlineUsers.includes(friend._id) ? "primary" : "secondary"} variant="dot" >
                     <UserImage image={friend.picturePath} size="45px" />
-                    </Badge>
-                  </IconButton>
-                  <Box>
+                  </Badge>
+                  {!isMobileMenuToggled && (
                     <Typography
                       color={theme.palette.neutral.main}
                       variant="h5"
@@ -211,13 +203,7 @@ const Chatroom = ({socket}) => {
                     >
                       {friend.firstName} {friend.lastName}
                     </Typography>
-                    <Typography
-                      color={theme.palette.neutral.medium}
-                      fontSize=".75rem"
-                    >
-                      {friend.occupation}
-                    </Typography>
-                  </Box>
+                  )}
                 </Box>
               ))}
             </Box>
@@ -235,7 +221,9 @@ const Chatroom = ({socket}) => {
             justifyContent="space-between"
             // gap=".5rem"
             p="1rem"
-            flexBasis={isNonMobileScreens ? "75%" : "60%"}
+            flexBasis={
+              isNonMobileScreens ? "75%" : isMobileMenuToggled ? "90%" : "60%"
+            }
             width="100%"
             //   border="2px solid blue"
             position="relative"
@@ -251,11 +239,24 @@ const Chatroom = ({socket}) => {
               gap=".75rem"
               // border="2px solid green"
               width="100%"
-              p="1rem"
+              p=".5rem"
               backgroundColor={theme.palette.background.alt}
               borderRadius=".75rem .75rem 0 0"
             >
-              <UserImage image={currentSelected.picturePath} size="35px" />
+              <IconButton
+                onClick={() => {
+                  navigate(`/profile/${currentSelected._id}`);
+                  navigate(0);
+                }}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: theme.palette.primary.light,
+                    cursor: "pointer",
+                  },
+                }}
+              >
+                <UserImage image={currentSelected.picturePath} size="35px" />
+              </IconButton>
               <Box position="relative" minWidth="30%">
                 <Typography
                   variant="h5"
@@ -264,11 +265,6 @@ const Chatroom = ({socket}) => {
                 >
                   {currentSelected.firstName}
                 </Typography>
-                {typing && (
-                  <Typography fontSize="x-small" position="absolute">
-                    {currentSelected.firstName} is typing....
-                  </Typography>
-                )}
               </Box>
             </Box>
 
@@ -279,6 +275,7 @@ const Chatroom = ({socket}) => {
                 socket={socket.current}
                 sentMessage={sentMessage}
                 arrivalMessage={arrivalMessage}
+                typing={typing}
               />
             </Box>
 

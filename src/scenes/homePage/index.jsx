@@ -1,23 +1,18 @@
 import { Box, useMediaQuery } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import Navbar from "scenes/navBar";
 import UserWidget from "scenes/widgets/UserWidget";
 import PostUploadWidget from "scenes/widgets/PostUploadWidget"
 import FeedsWidget from "scenes/widgets/FeedsWidget";
 import FriendsListWidget from "scenes/widgets/FriendsListWidget";
-import { addNotification, setNotifications, setonlineUsers } from "state";
-import { useEffect, useRef } from "react";
-import { io } from "socket.io-client";
+import { setNotifications } from "state";
+import { useEffect } from "react";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
 const HomePage = ({socket}) => {
-  // const socket = useRef();
   const isNonMobileScreens = useMediaQuery("(min-width : 1000px)");
   const { _id, picturePath } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
-  const user = useSelector((state) => state.user);
-  const notifications = useSelector((state) => state.notifications);
   const dispatch=useDispatch()
 
   const getUserNotifications = async () => {
@@ -31,52 +26,7 @@ const HomePage = ({socket}) => {
 
   useEffect(()=>{
     getUserNotifications();
-  },[])
-
-  // useEffect(() => {
-  //   if (user) {
-  //     socket.current = io(BaseUrl, {
-  //       reconnection: true,
-  //       reconnectionDelay: 500,
-  //       reconnectionAttempts: Infinity,
-  //     });
-  //     socket.current.emit("add-user", user._id);
-  //   }
-  // }, [user]);
-
-  // useEffect(()=>{
-  //   if(socket.current){
-  //     socket.current.on("online-users",(data)=>{
-  //       dispatch(setonlineUsers({ onlineUsers : data }))
-  //       console.log(data)
-  //     });
-  //   }
-  // },[user])
-
-  // useEffect(()=>{
-  //   socket.current.emit("online-users", user._id);
-  // },[])
-
-  // useEffect(() => {
-  //   if (socket.current) {
-  //     socket.current.on("get-notification", (data) => {
-  //      const newNotification= 
-  //         {
-  //           userId: data.userId,
-  //           toUserId : data.toUserId,
-  //           postId: data.id,
-  //           firstName: data.firstName,
-  //           lastName: data.lastName,
-  //           type: data.type,
-  //           notification: data.notification,
-  //           userPicturePath: data.userPicturePath,
-  //           postPicturePath: data.postPicturePath,
-  //           read : false,
-  //         }
-  //         dispatch(addNotification({notification : newNotification}))
-  //     });
-  //   }
-  // }, [user]);
+  },[]) //eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Box>
@@ -84,7 +34,6 @@ const HomePage = ({socket}) => {
         width="100%"
         p="2rem 6%"
         display={isNonMobileScreens ? "flex" : "block"}
-        // display="flex"
         gap=".5rem"
         justifyContent="space-between"
       >

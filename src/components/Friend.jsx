@@ -5,8 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { setFriends } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
-import { useEffect, useRef } from "react";
-import { io } from "socket.io-client";
+import { useState } from "react";
+import Lottie from "lottie-react";
+import animationData from "../animations/loading.json";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -17,6 +18,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, size, isProfile=fal
   const user= useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const friends = useSelector((state) => state.user.friends);
+  const [loading,setLoading]=useState(false)
 
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
@@ -27,6 +29,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, size, isProfile=fal
   const isFriend = friends.find((friend) => friend._id === friendId);
 
   const patchFriend = async () => {
+    setLoading(true)
       const response = await fetch(`${BaseUrl}/users/${_id}/${friendId}`, {
         method: "PATCH",
         headers: {
@@ -36,6 +39,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, size, isProfile=fal
       });
       const data = await response.json();
       dispatch(setFriends({ friends: data }));
+      setLoading(false)
       if(isFriend){
         socket.current.emit("send-notification", {
           from: user._id,
@@ -94,7 +98,13 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, size, isProfile=fal
         </Box>
       </FlexBetween>
       {(_id!==friendId && !isProfile) && (
-        <IconButton
+        loading ? (
+            <Lottie
+               animationData={animationData}
+               loop={true}
+             />
+        ):(
+          <IconButton
         onClick={() => patchFriend()}
         sx={{ backgroundColor: primaryLight, p: ".6rem" }}
       >
@@ -104,6 +114,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, size, isProfile=fal
             <PersonAddOutlined sx={{color: primaryDark}} />
         )}
       </IconButton>
+        )
       )}
     </FlexBetween>
   );

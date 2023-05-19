@@ -5,22 +5,16 @@ import {
   Button,
   Divider,
   IconButton,
-  Input,
-  InputAdornment,
-  InputBase,
   TextField,
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import FlexBetween from "components/FlexBetween";
 import Friend from "components/Friend";
 import UserImage from "components/UserImage";
-import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import Navbar from "scenes/navBar";
 import PostWidget from "scenes/widgets/PostWidget";
-import { setPost } from "state";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -45,7 +39,7 @@ const Postpage = ({socket}) => {
 
   useEffect(() => {
     getPost();
-  }, [posts]);
+  }, [posts]); //eslint-disable-line react-hooks/exhaustive-deps
 
   const handleComment = async () => {
     if (comment) {
@@ -93,12 +87,6 @@ const Postpage = ({socket}) => {
     setCurrentPost(data)
   }
 
-  const enterPress = (e) => {
-    if (e.key === "Enter") {
-      document.getElementById("commentBtn").click();
-    }
-  };
-
   return (
     currentPost && (
       <Box>
@@ -145,7 +133,6 @@ const Postpage = ({socket}) => {
                   size="small"
                   sx={{ ml: ".5rem", width: "100%" }}
                   onChange={(e) => setComment(e.target.value)}
-                  onKeyPress={enterPress}
                 />
               </Box>
               <Button

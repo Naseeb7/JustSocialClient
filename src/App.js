@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { BrowserRouter as Router, Navigate, Routes, Route } from "react-router-dom";
 import HomePage from "scenes/homePage";
 import LoginPage from "scenes/loginPage";
@@ -23,7 +23,6 @@ function App() {
   const socket = useRef();
   const mode = useSelector((state) => state.mode)
   const user = useSelector((state) => state.user);
-  const onlineUsers = useSelector((state) => state.onlineUsers);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode])
   const isAuth=Boolean(useSelector((state)=>state.token))
   const dispatch=useDispatch()
@@ -37,13 +36,13 @@ function App() {
         });
       }
       
-  }, []);
+  }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(()=>{
     if(socket.current){
       socket.current.emit("add-user", user._id);
     }
-  },[])
+  },[]) //eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(()=>{
     if(socket.current){
@@ -55,7 +54,7 @@ function App() {
         console.log("connected to backend")
       })
     }
-  },[])
+  },[]) //eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="App">

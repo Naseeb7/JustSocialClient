@@ -12,8 +12,10 @@ import FlexBetween from "components/FlexBetween";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { setFriends } from "state";
+import Lottie from "lottie-react";
+import animationData from "../../animations/loading.json";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -21,7 +23,6 @@ const UserWidget = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
   const { palette } = useTheme();
   const navigate = useNavigate();
-  const friendId=useParams()
   const token = useSelector((state) => state.token);
   const {_id} = useSelector((state) => state.user);
   const userFriends = useSelector((state) => state.user.friends);
@@ -31,16 +32,24 @@ const UserWidget = ({ userId, picturePath }) => {
   const primaryDark = palette.primary.dark;
   const primaryLight = palette.primary.light;
   const dispatch=useDispatch()
+  const [count,setCount]=useState(0)
+  const [loading,setLoading]=useState(false)
+  const [friendLoading,setFriendLoading]=useState(false)
 
   const isFriend = userFriends.find((friend) => friend._id === userId);
 
   const getUser = async () => {
+    setLoading(true)
     const response = await fetch(`${BaseUrl}/users/${userId}`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await response.json();
     setUser(data);
+    setCount(data.friends.length)
+    setTimeout(() => {
+    setLoading(false)
+    }, 1000);
   };
 
   useEffect(() => {
@@ -52,6 +61,7 @@ const UserWidget = ({ userId, picturePath }) => {
   }
 
   const patchFriend = async () => {
+    setFriendLoading(true)
       const response = await fetch(`${BaseUrl}/users/${_id}/${userId}`, {
         method: "PATCH",
         headers: {
@@ -61,6 +71,12 @@ const UserWidget = ({ userId, picturePath }) => {
       });
       const data = await response.json();
       dispatch(setFriends({ friends: data }));
+      if(!isFriend){
+        setCount(count+1)
+      }else(
+        setCount(count-1)
+      )
+      setFriendLoading(false)
   };
 
   const {
@@ -70,13 +86,31 @@ const UserWidget = ({ userId, picturePath }) => {
     occupation,
     viewedProfile,
     impressions,
-    friends,
   } = user;
 
   return (
     <WidgetWrapper>
-      {/* First Row */}
-      <FlexBetween
+      {loading ? (
+            <Box
+            display="flex"
+            justifyContent="center"
+            mt=".5rem"
+               // border="2px solid red"
+            >
+            <Lottie
+               animationData={animationData}
+               loop={true}
+               style={{
+                 width: "10%",
+                 height: "100%",
+                 // border: "2px solid green",
+               }}
+             />
+            </Box>
+         ) : (
+           <>
+           {/* First Row */}
+          <FlexBetween
         gap=".5rem"
         pb="1.1rem"
       >
@@ -98,7 +132,7 @@ const UserWidget = ({ userId, picturePath }) => {
             >
               {firstName} {lastName}
             </Typography>
-            <Typography color={medium}>{friends.length} friends</Typography>
+            <Typography color={medium}>{count} friends</Typography>
           </Box>
         </FlexBetween>
         {userId===_id ? ( 
@@ -106,7 +140,13 @@ const UserWidget = ({ userId, picturePath }) => {
         <ManageAccountsOutlined />
         </IconButton>
         ):(
-          <IconButton
+          friendLoading ? (
+            <Lottie
+               animationData={animationData}
+               loop={true}
+             />
+          ):(
+            <IconButton
         onClick={() => patchFriend()}
         sx={{ backgroundColor: primaryLight, p: ".6rem" }}
       >
@@ -116,6 +156,7 @@ const UserWidget = ({ userId, picturePath }) => {
             <PersonAddOutlined sx={{color: primaryDark}} />
         )}
       </IconButton>
+          )
         )}
       </FlexBetween>
 
@@ -178,6 +219,8 @@ const UserWidget = ({ userId, picturePath }) => {
           <EditOutlined sx={{ color: main }} />
         </FlexBetween>
       </Box>
+        </>
+      )}
     </WidgetWrapper>
   );
 };

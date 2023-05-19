@@ -1,19 +1,15 @@
 import { useTheme } from "@emotion/react";
 import { Box, Typography } from "@mui/material";
 import UserImage from "components/UserImage";
-import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { addNotification, setNotifications } from "state";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const NotificationWidget = ({ userId, token }) => {
+const NotificationWidget = () => {
   const notifications=useSelector((state)=>state.notifications)
-  const user = useSelector((state) => state.user);
   const theme = useTheme();
   const navigate = useNavigate();
-  const dispatch=useDispatch()
   
   return (
     <Box

@@ -1,17 +1,15 @@
 import { Box, useMediaQuery } from "@mui/material";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Navbar from "scenes/navBar";
 import FriendsListWidget from "scenes/widgets/FriendsListWidget";
 import NotificationWidget from "scenes/widgets/NotificationWidget";
-import { addNotification, setNotifications } from "state";
+import { setNotifications } from "state";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
 const NotificationPage = () => {
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
-  const notifications = useSelector((state) => state.notifications);
   const isNonMobileScreens=useMediaQuery("(min-width : 1000px)");
   const dispatch=useDispatch()
 
@@ -26,8 +24,8 @@ const NotificationPage = () => {
 
   useEffect(()=>{
     readAllNotifications();
-  },[])
-
+  },[]) //eslint-disable-line react-hooks/exhaustive-deps
+ 
   return (
     <Box>
       <Box display="flex" justifyContent="space-around" >

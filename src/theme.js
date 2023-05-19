@@ -3,7 +3,6 @@ export const colorTokens = {
     grey: {
       0: "#FFFFFF",
       10: "#F6F6F6",
-      15: "rgba(255, 255, 255, 0.675)",
       50: "#F0F0F0",
       100: "#E0E0E0",
       200: "#C2C2C2",
@@ -14,7 +13,6 @@ export const colorTokens = {
       700: "#333333",
       800: "#1A1A1A",
       900: "#0A0A0A",
-      950: "rgba(0, 0, 0, 0.655)",
       1000: "#000000",
     },
     primary: {
@@ -67,7 +65,6 @@ export const themeSettings = (mode) => {
               background: {
                 default: colorTokens.grey[900],
                 alt: colorTokens.grey[800],
-                transparent: colorTokens.grey[850],
               },
             }
           : {
@@ -90,7 +87,6 @@ export const themeSettings = (mode) => {
               background: {
                 default: colorTokens.grey[10],
                 alt: colorTokens.grey[0],
-                transparent: colorTokens.grey[15],
               },
             }),
       },

@@ -1,5 +1,5 @@
 import { useTheme } from "@emotion/react";
-import { InputOutlined, PhotoCameraOutlined } from "@mui/icons-material";
+import { PhotoCameraOutlined } from "@mui/icons-material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
@@ -16,13 +16,15 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import FlexBetween from "components/FlexBetween";
 import UserImage from "components/UserImage";
 import { useState } from "react";
 import Dropzone from "react-dropzone";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setFeeds, setUser } from "state";
+import { setUser } from "state";
+import Lottie from "lottie-react";
+import animationData from "../../animations/uploading.json";
+import animationData2 from "../../animations/loading.json";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -44,6 +46,9 @@ const AccountWidget = () => {
   const [ConfirmPassword, setConfirmPassword] = useState(null);
   const [success, setSuccess] = useState(true);
   const [wrongPassword, setWrongPassword] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [profilePicLoading, setProfilePicLoading] = useState(false);
   const [image, setImage] = useState(null);
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -54,7 +59,7 @@ const AccountWidget = () => {
   };
 
   const handleUpdate = async () => {
-    try {
+      setUpdateLoading(true)
       const response = await fetch(`${BaseUrl}/users/${user._id}/update`, {
         method: "POST",
         headers: {
@@ -78,12 +83,11 @@ const AccountWidget = () => {
       } else {
         setSuccess(false);
       }
-    } catch (error) {
-      console.log(error);
-    }
+      setUpdateLoading(false)
   };
 
   const handleChangePassword = async () => {
+    setPasswordLoading(true)
     if (
       newPassword === ConfirmPassword &&
       newPassword !== "" &&
@@ -103,6 +107,7 @@ const AccountWidget = () => {
           }),
         }
       );
+    setPasswordLoading(false)
       const updatedUser = await response.json();
       if (updatedUser.success === false) {
         setWrongPassword(true);
@@ -146,6 +151,7 @@ const AccountWidget = () => {
   }
 
   const handleProfilePicture = async () => {
+    setProfilePicLoading(true)
     const formData = new FormData();
     formData.append("picture", image);
     formData.append("newPicturePath", image.name);
@@ -158,6 +164,7 @@ const AccountWidget = () => {
       body: formData,
     });
     const updatedUser = await response.json();
+    setProfilePicLoading(false)
     if (updatedUser.success === true) {
       dispatch(setUser({ user: updatedUser.user }));
       setImage(null);
@@ -238,10 +245,17 @@ const AccountWidget = () => {
               height="200px"
               width="200px"
               style={{ objectFit: "cover", borderRadius: "50%" }}
+              alt={image.name}
             />
             Preview
             <Box display="flex" width="100%" justifyContent="space-evenly">
-              <Button
+              {profilePicLoading ? (
+                <Lottie
+                animationData={animationData}
+                loop={true}
+              />
+              ):(
+                <Button
                 sx={{
                   p: ".25rem 0",
                   backgroundColor: theme.palette.primary.main,
@@ -252,6 +266,7 @@ const AccountWidget = () => {
               >
                 Change
               </Button>
+              )}
               <Button
                 sx={{
                   p: ".25rem 0",
@@ -467,8 +482,14 @@ const AccountWidget = () => {
                 </FormHelperText>
               </FormControl>
             </Box>
-            <Box display="flex" width="80%" justifyContent="space-evenly">
-              <Button
+            <Box display="flex" width="50%" justifyContent="space-between">
+              {updateLoading ? (
+                <Lottie
+                animationData={animationData2}
+                loop={true}
+              />
+              ) : (
+                <Button
                 sx={{
                   p: ".5rem 0",
                   backgroundColor: theme.palette.primary.main,
@@ -480,6 +501,7 @@ const AccountWidget = () => {
               >
                 Update
               </Button>
+              )}
               <Button
                 sx={{
                   p: ".5rem 0",
@@ -596,8 +618,14 @@ const AccountWidget = () => {
               Change Password
             </Button>
           ) : (
-            <Box display="flex" width="80%" justifyContent="space-evenly">
-              <Button
+            <Box display="flex" width="50%" justifyContent="space-between">
+              {passwordLoading ? (
+                <Lottie
+                animationData={animationData2}
+                loop={true}
+              />
+              ) : (
+                <Button
                 sx={{
                   p: ".5rem 0",
                   backgroundColor: theme.palette.primary.main,
@@ -614,6 +642,7 @@ const AccountWidget = () => {
               >
                 Change
               </Button>
+              )}
               <Button
                 sx={{
                   p: ".5rem 0",

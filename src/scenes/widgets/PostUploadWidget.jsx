@@ -1,11 +1,7 @@
 import {
   EditOutlined,
   DeleteOutlined,
-  AttachFileOutlined,
-  GifBoxOutlined,
   ImageOutlined,
-  MicOutlined,
-  MoreHorizOutlined,
   AddLocationAltOutlined,
 } from "@mui/icons-material";
 import {
@@ -17,7 +13,6 @@ import {
   Button,
   IconButton,
   useMediaQuery,
-  TextField,
 } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
 import Dropzone from "react-dropzone";
@@ -26,12 +21,13 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFeeds } from "state";
+import Lottie from "lottie-react";
+import animationData from "../../animations/uploading.json";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const PostUploadWidget = ({ picturePath,isProfile=false }) => {
+const PostUploadWidget = ({ picturePath, isProfile = false }) => {
   const dispatch = useDispatch();
-  const [isMobileMenuToggled, setisMobileMenuToggled] = useState(false);
   const [isImage, setIsImage] = useState(false);
   const [image, setImage] = useState(null);
   const [post, setPost] = useState("");
@@ -41,10 +37,12 @@ const PostUploadWidget = ({ picturePath,isProfile=false }) => {
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width : 1000px)");
+  const [loading, setLoading] = useState(false);
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
 
   const handlePost = async () => {
+    setLoading(true)
     const formData = new FormData();
     formData.append("userId", _id);
     formData.append("description", post);
@@ -59,15 +57,16 @@ const PostUploadWidget = ({ picturePath,isProfile=false }) => {
       body: formData,
     });
     const data = await response.json();
-    if(isProfile){
+    if (isProfile) {
       dispatch(setFeeds({ posts: data.userposts }));
-    }else{
+    } else {
       dispatch(setFeeds({ posts: data.posts }));
     }
     setImage(null);
     setPost("");
-    setLocation("")
-    setIsImage(false)
+    setLocation("");
+    setIsImage(false);
+    setLoading(false)
   };
 
   return (
@@ -87,19 +86,27 @@ const PostUploadWidget = ({ picturePath,isProfile=false }) => {
           multiline
         />
       </FlexBetween>
-        {isLocation && <Box display="flex" gap="1rem" mt="1rem" width="100%" justifyContent="center">
-        <InputBase
-          placeholder="location"
-          onChange={(e) => setLocation(e.target.value)}
-          value={location}
-          sx={{
-            width: "55%",
-            backgroundColor: palette.neutral.light,
-            borderRadius: "2rem",
-            p: ".2rem 1rem",
-          }}
-        />
-        </Box>}
+      {isLocation && (
+        <Box
+          display="flex"
+          gap="1rem"
+          mt="1rem"
+          width="100%"
+          justifyContent="center"
+        >
+          <InputBase
+            placeholder="location"
+            onChange={(e) => setLocation(e.target.value)}
+            value={location}
+            sx={{
+              width: "55%",
+              backgroundColor: palette.neutral.light,
+              borderRadius: "2rem",
+              p: ".2rem 1rem",
+            }}
+          />
+        </Box>
+      )}
       {isImage && (
         <Box
           borderRadius="10px"
@@ -163,79 +170,59 @@ const PostUploadWidget = ({ picturePath,isProfile=false }) => {
         </FlexBetween>
         {isNonMobileScreens ? (
           <>
-            <FlexBetween gap=".25rem">
-              <GifBoxOutlined sx={{ color: mediumMain }} />
-              <Typography sx={{ color: mediumMain }}>Clip</Typography>
-            </FlexBetween>
-
-            <FlexBetween gap=".25rem">
-              <MicOutlined sx={{ color: mediumMain }} />
-              <Typography sx={{ color: mediumMain }}>Audio</Typography>
-            </FlexBetween>
-
-            <FlexBetween gap=".25rem" onClick={()=>setIsLocation(!isLocation)}>
+            <FlexBetween
+              gap=".25rem"
+              onClick={() => setIsLocation(!isLocation)}
+            >
               <AddLocationAltOutlined sx={{ color: mediumMain }} />
-              <Typography sx={{ color: mediumMain,"&:hover": { cursor: "pointer", color: medium }  }}>Location</Typography>
+              <Typography
+                sx={{
+                  color: mediumMain,
+                  "&:hover": { cursor: "pointer", color: medium },
+                }}
+              >
+                Location
+              </Typography>
             </FlexBetween>
           </>
         ) : (
           <>
-            <FlexBetween gap=".25rem" onClick={()=>{setisMobileMenuToggled(!isMobileMenuToggled)}}>
-                <MoreHorizOutlined sx={{color : mediumMain}} />
+            <FlexBetween
+              gap=".25rem"
+              onClick={() => setIsLocation(!isLocation)}
+            >
+              <AddLocationAltOutlined sx={{ color: mediumMain }} />
+              <Typography
+                sx={{
+                  color: mediumMain,
+                  "&:hover": { cursor: "pointer", color: medium },
+                }}
+              >
+                Location
+              </Typography>
             </FlexBetween>
           </>
         )}
 
-        
-
-        <Button 
+        {loading ? (
+          <Lottie
+            animationData={animationData}
+            loop={true}
+          />
+        ) : (
+          <Button
             disabled={!post}
             onClick={handlePost}
             sx={{
-                color: palette.background.alt,
-                backgroundColor : palette.primary.main,
-                borderRadius : "3rem"
-            }}>Post</Button>
-      </FlexBetween>
-      {isMobileMenuToggled && (
-          <Box
-          zIndex="10"
-          maxWidth="500px"
-          minWidth="300px"
-          background={palette.background.alt}
-          mt="1rem"
-        >
-
-          {/* Menu Items */}
-          <FlexBetween
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            gap="3rem"
+              color: palette.background.alt,
+              backgroundColor: palette.primary.main,
+              borderRadius: "3rem",
+            }}
           >
-            <FlexBetween gap=".25rem">
-              <GifBoxOutlined sx={{ color: mediumMain }} />
-              <Typography sx={{ color: mediumMain }}>Clip</Typography>
-            </FlexBetween>
-
-            <FlexBetween gap=".25rem">
-              <AttachFileOutlined sx={{ color: mediumMain }} />
-              <Typography sx={{ color: mediumMain }}>Attachment</Typography>
-            </FlexBetween>
-
-            <FlexBetween gap=".25rem">
-              <MicOutlined sx={{ color: mediumMain }} />
-              <Typography sx={{ color: mediumMain }}>Audio</Typography>
-            </FlexBetween>
-
-            <FlexBetween gap=".25rem" onClick={()=>setIsLocation(!isLocation)}>
-              <AddLocationAltOutlined sx={{ color: mediumMain }} />
-              <Typography sx={{ color: mediumMain,"&:hover": { cursor: "pointer", color: medium }  }}>Location</Typography>
-            </FlexBetween>
-          </FlexBetween>
-        </Box>
+            POST
+          </Button>
         )}
+      </FlexBetween>
     </WidgetWrapper>
   );
 };
