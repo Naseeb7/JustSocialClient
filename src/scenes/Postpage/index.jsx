@@ -14,7 +14,7 @@ import UserImage from "components/UserImage";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import postWidget from "scenes/widgets/PostWidget";
+import PostWidget from "scenes/widgets/postWidget";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -103,7 +103,7 @@ const Postpage = ({socket}) => {
             sx={{ background: theme.palette.background.alt }}
             borderRadius=".75rem"
           >
-            <postWidget
+            <PostWidget
               postId={currentPost._id}
               postUserId={currentPost.userId}
               name={`${currentPost.firstName} ${currentPost.lastName}`}

@@ -15,7 +15,7 @@ import { setFeeds, setPost } from "state";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const postWidget = ({
+const PostWidget = ({
   postId,
   postUserId,
   name,
@@ -165,4 +165,4 @@ const postWidget = ({
   );
 };
 
-export default postWidget;
+export default PostWidget;
