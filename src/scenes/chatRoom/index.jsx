@@ -122,7 +122,7 @@ const Chatroom = ({ socket }) => {
           display="flex"
           flexDirection="column"
           gap=".75rem"
-          p="1rem"
+          p=".5rem"
           flexBasis={
             isNonMobileScreens ? "25%" : isMobileMenuToggled ? "10%" : "40%"
           }
@@ -196,13 +196,21 @@ const Chatroom = ({ socket }) => {
                     <UserImage image={friend.picturePath} size="45px" />
                   </Badge>
                   {!isMobileMenuToggled && (
-                    <Typography
-                      color={theme.palette.neutral.main}
-                      variant="h5"
-                      fontWeight="500"
-                    >
-                      {friend.firstName} {friend.lastName}
-                    </Typography>
+                      <Typography
+                        color={theme.palette.neutral.main}
+                        variant="h5"
+                        fontWeight="500"
+                      >
+                        {friend.firstName} {friend.lastName}{" "}
+                        {typing && (
+                          <Typography
+                            color={theme.palette.neutral.main}
+                            fontSize="x-small"
+                          >
+                            is typing
+                          </Typography>
+                        )}
+                      </Typography>
                   )}
                 </Box>
               ))}
@@ -220,12 +228,12 @@ const Chatroom = ({ socket }) => {
             flexDirection="column"
             justifyContent="space-between"
             // gap=".5rem"
-            p="1rem"
+            p=".5rem"
             flexBasis={
               isNonMobileScreens ? "75%" : isMobileMenuToggled ? "90%" : "60%"
             }
             width="100%"
-            //   border="2px solid blue"
+            // border="2px solid blue"
             position="relative"
             borderRadius="0 .75rem .75rem 0"
             m=".35rem"
@@ -264,6 +272,12 @@ const Chatroom = ({ socket }) => {
                   color={theme.palette.neutral.dark}
                 >
                   {currentSelected.firstName}
+                </Typography>
+                <Typography
+                  fontSize="x-small"
+                  color={theme.palette.neutral.dark}
+                >
+                  {onlineUsers.includes(currentSelected._id) && "online"}
                 </Typography>
               </Box>
             </Box>
