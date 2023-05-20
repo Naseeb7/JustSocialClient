@@ -201,15 +201,7 @@ const Chatroom = ({ socket }) => {
                         variant="h5"
                         fontWeight="500"
                       >
-                        {friend.firstName} {friend.lastName}{" "}
-                        {typing && (
-                          <Typography
-                            color={theme.palette.neutral.main}
-                            fontSize="x-small"
-                          >
-                            is typing
-                          </Typography>
-                        )}
+                        {friend.firstName} {friend.lastName}
                       </Typography>
                   )}
                 </Box>
