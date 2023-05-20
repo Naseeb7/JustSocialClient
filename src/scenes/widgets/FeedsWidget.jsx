@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFeeds } from "state";
-import PostWidget from "./PostWidget";
+import PostWidget from "./Postwidget";
 import Lottie from "lottie-react";
 import animationData from "animations/loading.json";
 import { Box } from "@mui/material";

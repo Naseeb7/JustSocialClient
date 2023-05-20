@@ -14,7 +14,7 @@ import UserImage from "components/UserImage";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import PostWidget from "scenes/widgets/PostWidget";
+import PostWidget from "scenes/widgets/Postwidget";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
