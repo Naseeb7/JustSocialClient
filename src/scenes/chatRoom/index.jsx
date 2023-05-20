@@ -47,7 +47,7 @@ const Chatroom = ({ socket }) => {
         if(data.from === currentSelected._id){
           setArrivalMessage({
             fromSelf: false,
-            message: message,
+            message: data.message,
             created: new Date().getTime(),
           });
         }
@@ -62,7 +62,7 @@ const Chatroom = ({ socket }) => {
         }
       });
     }
-  }, [user]); //eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentSelected]); //eslint-disable-line react-hooks/exhaustive-deps
 
   const getFriends = async () => {
     const response = await fetch(`${BaseUrl}/users/${user._id}/friends`, {
