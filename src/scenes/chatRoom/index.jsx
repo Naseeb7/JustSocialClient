@@ -43,17 +43,19 @@ const Chatroom = ({ socket }) => {
   useEffect(() => {
     if (socket.current) {
       socket.current.off("message-receive");
-      socket.current.on("message-receive", (message) => {
-        setArrivalMessage({
-          fromSelf: false,
-          message: message,
-          created: new Date().getTime(),
-        });
+      socket.current.on("message-receive", (data) => {
+        if(data.from === currentSelected._id){
+          setArrivalMessage({
+            fromSelf: false,
+            message: message,
+            created: new Date().getTime(),
+          });
+        }
       });
       socket.current.off("typing-data");
       socket.current.on("typing-data", (data) => {
-        if (!typing) {
-          setTyping(data);
+        if(data.from === currentSelected._id){
+          setTyping(data.typing);
           setTimeout(() => {
             setTyping(false);
           }, 1500);
@@ -109,6 +111,7 @@ const Chatroom = ({ socket }) => {
   const handleChange = (e) => {
     setMessage(e.target.value);
     socket.current.emit("typing", {
+      from : user._id,
       to: currentSelected._id,
       typing: true,
     });
