@@ -14,11 +14,11 @@ import UserImage from "components/UserImage";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import PostWidget from "../widgets/PostWidget";
+import PostWidget from "scenes/widgets/PostWidget";
 
 const BaseUrl = process.env.REACT_APP_BASE_URL;
 
-const Postpage = ({socket}) => {
+const PostPage = ({socket}) => {
   const [comment, setComment] = useState(null);
   const { postId } = useParams();
   const posts = useSelector((state) => state.posts);
@@ -211,4 +211,4 @@ const Postpage = ({socket}) => {
   );
 };
 
-export default Postpage;
+export default PostPage;
