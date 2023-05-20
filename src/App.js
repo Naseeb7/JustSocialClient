@@ -61,7 +61,7 @@ function App() {
       <Router>
         <ThemeProvider theme={theme}>
           <CssBaseline/>
-          {window.location.href!==`${url}/` && (isAuth && (<Navbar  socket={socket}/>))}
+          (window.location.href!==`${url}/` && isAuth) && <Navbar  socket={socket}/>
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/home" element={isAuth ? <HomePage socket={socket} /> : <Navigate to="/"/>} />
