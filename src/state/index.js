@@ -4,6 +4,8 @@ const initialState = {
     mode : "light",
     user : null,
     token : null,
+    messageCounter : null,
+    messageFrom : [],
     posts: [],
     users:[],
     notifications:[],
@@ -27,8 +29,21 @@ export const authSlice= createSlice({
         setonlineUsers : (state,action)=>{
             state.onlineUsers=action.payload.onlineUsers;
         },
+        setMessageFrom : (state,action)=>{
+            state.messageFrom=state.messageFrom.concat(action.payload.from)
+        },
+        updateMessageFrom : (state,action)=>{
+            state.messageFrom=state.messageFrom.filter((id)=> id !== action.payload.id)
+        },
         setNotifications : (state,action)=>{
             state.notifications=action.payload.notifications;
+        },
+        setMessageCounter : (state,action)=>{
+            if(action.payload.messageCounter === null){
+                state.messageCounter=null
+            }else{
+                state.messageCounter+=action.payload.messageCounter;
+            }
         },
         addNotification : (state,action)=>{
             state.notifications=[...state.notifications,action.payload.notification]
@@ -60,5 +75,5 @@ export const authSlice= createSlice({
     }
 })
 
-export const {setMode, setLogin, setLogout, setFriends, setFeeds, setPost, setUser, setUsers, setNotifications, addNotification, setonlineUsers}= authSlice.actions;
+export const {setMode, setLogin, setLogout, setFriends, setFeeds, setPost, setUser, setUsers, updateMessageFrom, setMessageFrom, setNotifications, setMessageCounter, addNotification, setonlineUsers}= authSlice.actions;
 export default authSlice.reducer;

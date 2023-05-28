@@ -9,7 +9,12 @@ import Picker from "emoji-picker-react";
 import { EmojiEmotionsOutlined } from "@mui/icons-material";
 import Messages from "components/Messages";
 import "./index.css";
-import { setFriends } from "state";
+import {
+  setFriends,
+  setMessageCounter,
+  setMessageFrom,
+  updateMessageFrom,
+} from "state";
 
 const {
   Box,
@@ -30,6 +35,7 @@ const Chatroom = ({ socket }) => {
   const mode = useSelector((state) => state.mode);
   const token = useSelector((state) => state.token);
   const onlineUsers = useSelector((state) => state.onlineUsers);
+  const messageFrom = useSelector((state) => state.messageFrom);
   const navigate = useNavigate();
   const [currentSelected, setCurrentSelected] = useState(null);
   const [sentMessage, setSentMessage] = useState(null);
@@ -42,25 +48,29 @@ const Chatroom = ({ socket }) => {
 
   useEffect(() => {
     if (socket.current) {
-      socket.current.off("message-receive");
-      socket.current.on("message-receive", (data) => {
-        if(data.from === currentSelected._id){
-          setArrivalMessage({
-            fromSelf: false,
-            message: data.message,
-            created: new Date().getTime(),
-          });
-        }
-      });
-      socket.current.off("typing-data");
-      socket.current.on("typing-data", (data) => {
-        if(data.from === currentSelected._id){
-          setTyping(data.typing);
-          setTimeout(() => {
-            setTyping(false);
-          }, 1500);
-        }
-      });
+      if (currentSelected) {
+        socket.current.off("message-receive");
+        socket.current.on("message-receive", (data) => {
+          if (data.from === currentSelected._id) {
+            setArrivalMessage({
+              fromSelf: false,
+              message: data.message,
+              created: new Date().getTime(),
+            });
+          } else {
+            dispatch(setMessageFrom({ from: data.from }));
+          }
+        });
+        socket.current.off("typing-data");
+        socket.current.on("typing-data", (data) => {
+          if (data.from === currentSelected._id) {
+            setTyping(data.typing);
+            setTimeout(() => {
+              setTyping(false);
+            }, 1000);
+          }
+        });
+      }
     }
   }, [currentSelected]); //eslint-disable-line react-hooks/exhaustive-deps
 
@@ -75,6 +85,7 @@ const Chatroom = ({ socket }) => {
 
   useEffect(() => {
     getFriends();
+    dispatch(setMessageCounter({ messageCounter: null }));
   }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
   const onEmojiClick = (e) => {
@@ -83,35 +94,40 @@ const Chatroom = ({ socket }) => {
   };
 
   const handleSendMessage = async () => {
-    const response = await fetch(`${BaseUrl}/message/${user._id}/addmessage`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    if (message !== "") {
+      socket.current.off("send-message");
+      socket.current.emit("send-message", {
         from: user._id,
         to: currentSelected._id,
         message: message,
-      }),
-    });
-    // eslint-disable-next-line
-    const data = await response.json();
-    socket.current.off("send-message");
-    socket.current.emit("send-message", {
-      from: user._id,
-      to: currentSelected._id,
-      message: message,
-    });
-    setIsemoji(false);
-    setMessage("");
-    setSentMessage(message);
+      });
+      setIsemoji(false);
+      setMessage("");
+      setSentMessage(message);
+      const response = await fetch(
+        `${BaseUrl}/message/${user._id}/addmessage`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: user._id,
+            to: currentSelected._id,
+            message: message,
+          }),
+        }
+      );
+      // eslint-disable-next-line
+      const data = await response.json();
+    }
   };
 
   const handleChange = (e) => {
     setMessage(e.target.value);
     socket.current.emit("typing", {
-      from : user._id,
+      from: user._id,
       to: currentSelected._id,
       typing: true,
     });
@@ -155,7 +171,9 @@ const Chatroom = ({ socket }) => {
                   m=".5rem 0"
                   display="flex"
                   gap="1rem"
+                  position="relative"
                   alignItems="center"
+                  justifyContent="space-between"
                   sx={{
                     "&:hover": {
                       cursor: "pointer",
@@ -171,34 +189,39 @@ const Chatroom = ({ socket }) => {
                   onClick={() => {
                     if (!isMobileMenuToggled) {
                       setCurrentSelected(friend);
+                      dispatch(updateMessageFrom({ id: friend._id }));
                       setMessage("");
                     }
                     setIsemoji(false);
                   }}
                   //   border="2px solid red"
                 >
-                  <Badge
-                    color={
-                      onlineUsers.includes(friend._id) ? "primary" : "secondary"
-                    }
-                    sx={{
-                      "& .MuiBadge-badge": {
-                        backgroundColor: onlineUsers.includes(friend._id)
-                          ? theme.palette.primary.main
-                          : theme.palette.neutral.medium,
-                        padding: ".32rem",
-                      },
-                    }}
-                    anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: "right",
-                    }}
-                    overlap="circular"
-                    variant="dot"
-                  >
-                    <UserImage image={friend.picturePath} size="45px" />
-                  </Badge>
-                  {!isMobileMenuToggled && (
+                  <Box display="flex" alignItems="center" gap="1rem">
+                    <Badge
+                      color={
+                        onlineUsers.includes(friend._id)
+                          ? "primary"
+                          : "secondary"
+                      }
+                      sx={{
+                        "& .MuiBadge-badge": {
+                          backgroundColor: onlineUsers.includes(friend._id)
+                            ? theme.palette.primary.main
+                            : theme.palette.neutral.medium,
+                          padding: ".32rem",
+                        },
+                      }}
+                      anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "right",
+                      }}
+                      overlap="circular"
+                      badgeContent={messageFrom.includes(friend._id) && messageFrom.filter((id) => id === friend._id).length}
+                      variant={!messageFrom.includes(friend._id) && "dot"}
+                    >
+                      <UserImage image={friend.picturePath} size="45px" />
+                    </Badge>
+                    {!isMobileMenuToggled && (
                       <Typography
                         color={theme.palette.neutral.main}
                         variant="h5"
@@ -206,7 +229,8 @@ const Chatroom = ({ socket }) => {
                       >
                         {friend.firstName} {friend.lastName}
                       </Typography>
-                  )}
+                    )}
+                  </Box>
                 </Box>
               ))}
             </Box>
@@ -309,6 +333,7 @@ const Chatroom = ({ socket }) => {
                   >
                     <Picker
                       height="40vh"
+                      width={!isNonMobileScreens && "70%"}
                       theme={mode === "dark" ? "dark" : "light"}
                       onEmojiClick={onEmojiClick}
                       previewConfig={{ showPreview: false }}

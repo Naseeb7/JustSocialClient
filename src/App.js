@@ -50,9 +50,6 @@ function App() {
         dispatch(setonlineUsers({ onlineUsers : data }))
         // console.log(data)
       });
-      socket.current.on("connect",()=>{
-        console.log("connected to backend")
-      })
     }
   },[]) //eslint-disable-line react-hooks/exhaustive-deps
 

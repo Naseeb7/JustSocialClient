@@ -119,6 +119,10 @@ const PostWidget = ({
           onClick={() => {
             !isPostPage && navigate(`/post/${postId}`);
           }}
+          onError={(e)=>{
+            e.target.onError = null;
+            e.target.src="https://i.ibb.co/zx3dYdR/no-image.jpg"
+        }}
         />
       )}
       <FlexBetween mt=".25rem">

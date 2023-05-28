@@ -15,6 +15,8 @@ import { useDispatch } from "react-redux";
 import { setLogin } from "state";
 import Dropzone from "react-dropzone";
 import FlexBetween from "components/FlexBetween";
+import Lottie from "lottie-react";
+import animationData from "animations/loading.json";
 
 const BaseUrl=process.env.REACT_APP_BASE_URL
 
@@ -54,6 +56,7 @@ const initialValueLogin = {
 
 const Form = () => {
   const [pageType, setPageType] = useState("login");
+  const [loading,setLoading]=useState(false)
   const { palette } = useTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -63,6 +66,7 @@ const Form = () => {
 
   const register=async (values,onSubmitProps)=>{
     // this allows to send form info with image
+    setLoading(true)
     const formData=new FormData();
     for(let value in values){
         formData.append(value, values[value])
@@ -78,6 +82,7 @@ const Form = () => {
     );
     const savedUser= saveduserResponse.json();
     onSubmitProps.resetForm()
+    setLoading(false)
 
     if(savedUser){
         setPageType("login")
@@ -85,6 +90,7 @@ const Form = () => {
   };
 
   const login=async (values,onSubmitProps)=>{
+    setLoading(true)
     const loggedInUserResponse=await fetch(
         `${BaseUrl}/auth/login`,
         {
@@ -95,6 +101,7 @@ const Form = () => {
     );
     const loggedIn=await loggedInUserResponse.json();
     onSubmitProps.resetForm()
+    setLoading(false)
 
     if(loggedIn){
         dispatch(
@@ -260,14 +267,25 @@ const Form = () => {
                 "&:hover": { color: palette.primary.main },
               }}
             >
-              {isLogin ? "LOGIN" : "REGISTER"}
+              {loading ? (
+                <Lottie
+                animationData={animationData}
+                loop={true}
+                style={{
+                  width : "2.3%",
+                }}
+              />
+              ) : (
+                isLogin ? "LOGIN" : "REGISTER"
+              )}
+              
             </Button>
             <Typography
               onClick={() => {
                 setPageType(isLogin ? "register" : "login");
                 resetForm();
               }}
-              width="40%"
+              width={isNonMobile ? "40%" : "85%"}
               sx={{
                 textDecoration: "underline",
                 color: palette.primary.main,

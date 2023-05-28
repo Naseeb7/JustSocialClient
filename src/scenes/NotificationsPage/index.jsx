@@ -29,7 +29,7 @@ const NotificationPage = () => {
   return (
     <Box>
       <Box display="flex" justifyContent="space-around" >
-        <Box flexBasis={isNonMobileScreens ? "50%" : "70%"}>
+        <Box flexBasis={isNonMobileScreens ? "50%" : "95%"}>
         <NotificationWidget userId={user._id} token={token} />
         </Box>
         {isNonMobileScreens && (

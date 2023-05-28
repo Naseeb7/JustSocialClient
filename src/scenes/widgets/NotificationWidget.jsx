@@ -64,6 +64,10 @@ const NotificationWidget = () => {
                   width="40px"
                   alt="Post"
                   style={{ borderRadius: ".5rem" }}
+                  onError={(e)=>{
+                    e.target.onError = null;
+                    e.target.src="https://i.ibb.co/zx3dYdR/no-image.jpg"
+                }}
                 />
               )}
             </Box>

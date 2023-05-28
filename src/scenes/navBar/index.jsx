@@ -27,6 +27,8 @@ import {
   setUsers,
   addNotification,
   setNotifications,
+  setMessageCounter,
+  setMessageFrom,
 } from "state";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "components/FlexBetween";
@@ -46,6 +48,8 @@ const Navbar = ({ socket }) => {
   const users = useSelector((state) => state.users);
   const mode = useSelector((state) => state.mode);
   const notifications = useSelector((state) => state.notifications);
+  const messageCounter = useSelector((state) => state.messageCounter);
+  const messageFrom = useSelector((state) => state.messageFrom);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
   const theme = useTheme();
@@ -116,6 +120,17 @@ const Navbar = ({ socket }) => {
           read: window.location.href === `${url}/notifications` ? true : false,
         };
         dispatch(addNotification({ notification: newNotification }));
+      });
+    }
+  }, [user]); //eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.off("message-receive");
+      socket.current.on("message-receive", (data) => {
+        dispatch(setMessageCounter({ messageCounter: 1 }));
+        dispatch(setMessageFrom({ from: data.from }));
+        console.log("message")
       });
     }
   }, [user]); //eslint-disable-line react-hooks/exhaustive-deps
@@ -231,7 +246,9 @@ const Navbar = ({ socket }) => {
               setQ("");
             }}
           >
-            <Message sx={{ color: dark, fontSize: "25px" }} />
+            <Badge badgeContent={messageFrom.length} color="primary">
+              <Message sx={{ color: dark, fontSize: "25px" }} />
+            </Badge>
           </IconButton>
           <IconButton
             onClick={() => {
@@ -295,7 +312,11 @@ const Navbar = ({ socket }) => {
               <Badge
                 color="primary"
                 variant="dot"
-                invisible={notificationcounter === 0 ? true : false}
+                invisible={
+                  notificationcounter === 0 && messageCounter === null
+                    ? true
+                    : false
+                }
               >
                 <Menu />
               </Badge>
@@ -414,7 +435,9 @@ const Navbar = ({ socket }) => {
                 setQ("");
               }}
             >
-              <Message sx={{ color: dark, fontSize: "25px" }} />
+              <Badge badgeContent={messageFrom.length} color="primary">
+                <Message sx={{ color: dark, fontSize: "25px" }} />
+              </Badge>
             </IconButton>
             <IconButton
               onClick={() => {

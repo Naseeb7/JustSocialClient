@@ -13,6 +13,10 @@ const UserImage = ({image, size="60px"})=>{
                 height={size}
                 alt="user"
                 src={`${BaseUrl}/assets/${image}`}
+                onError={(e)=>{
+                    e.target.onError = null;
+                    e.target.src="https://i.ibb.co/K9VP0Qn/person-icon-black-background-person-solid-vector-eps-90447225.jpg";
+                }}
             />
         </Box>
     )

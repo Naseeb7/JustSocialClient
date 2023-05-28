@@ -71,21 +71,21 @@ const PostUploadWidget = ({ picturePath, isProfile = false }) => {
 
   return (
     <WidgetWrapper>
-      <FlexBetween gap="1.5rem">
+      <Box display="flex" justifyContent="space-around">
         <UserImage image={picturePath} />
         <InputBase
           placeholder="what's on your mind today?"
           onChange={(e) => setPost(e.target.value)}
           value={post}
           sx={{
-            width: "100%",
+            width: "75%",
             backgroundColor: palette.neutral.light,
             borderRadius: "2rem",
             p: "1rem 2rem",
           }}
           multiline
         />
-      </FlexBetween>
+      </Box>
       {isLocation && (
         <Box
           display="flex"
